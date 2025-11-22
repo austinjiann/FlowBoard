@@ -17,6 +17,7 @@ services.add_instance(vertex_service, VertexService)
 services.add_instance(job_service, JobService)
 
 app = Application(services=services)
+app.use_controllers()
 
 for route in app.router:
     print(f"a")

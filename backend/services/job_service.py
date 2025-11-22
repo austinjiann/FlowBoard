@@ -33,9 +33,16 @@ class JobService:
             return None
 
         result = await self.vertex_service.get_video_status(self.jobs[job_id].operation)
-        return JobStatus(
+
+        ret = JobStatus(
             status=result.status,
             job_start_time=self.jobs[job_id].job_start_time,
             job_end_time=datetime.now() if result.status == "done" else None,
             video_url=result.video_url.replace("gs://", "https://storage.googleapis.com/") if result.video_url else None
         )
+
+        if result.status == "done":
+            # Clean up completed job
+            del self.jobs[job_id]
+
+        return ret
