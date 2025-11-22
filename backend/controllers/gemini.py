@@ -5,7 +5,7 @@ import tempfile
 import os
 import json as pyjson
 
-from backend.services.vertex_service import VertexService
+from services.vertex_service import VertexService
 
 class GeminiController(APIController):
     
