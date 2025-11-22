@@ -31,5 +31,5 @@ class JobService:
         return JobStatus(
             status=result.status,
             job_start_time=self.jobs[job_id].job_start_time,
-            video_url=result.video_url
+            video_url=result.video_url.replace("gs://", "https://storage.googleapis.com/") if result.video_url else None
         )

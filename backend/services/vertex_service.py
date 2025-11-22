@@ -15,7 +15,7 @@ class VertexService:
     async def generate_video_content(self, prompt: str, image_data: bytes = None):
         # gen vid
         operation = self.client.models.generate_videos(
-            model="veo-3.1-generate-001",
+            model="veo-3.1-fast-generate-001",
             prompt="a cat reading a book",
             config=GenerateVideosConfig(
                 aspect_ratio="16:9",
