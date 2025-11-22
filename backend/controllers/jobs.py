@@ -14,15 +14,15 @@ class Jobs(APIController):
         Input: starting image, context, any other user-prompt
         Return: jobId
         """
-        job_id = await self.job_service.create_job(data)
+        job_id = await self.job_service.create_video_job(data)
         return json({"jobId": job_id})
 
     @get("/video/{job_id}")
-    async def get_job_status(self, job_id: str):
+    async def get_video_job_status(self, job_id: str):
         """
         Get status of job
         """
-        status = await self.job_service.get_job_status(job_id)
+        status = await self.job_service.get_video_job_status(job_id)
         
         if not status:
             return json({"error": "Job not found"}, status=404)

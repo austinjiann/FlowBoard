@@ -1,4 +1,5 @@
 from google import genai
+from google.genai.types import GenerateVideosConfig, GenerateVideosOperation
 from models.job import JobStatus
 from utils.env import settings
 
@@ -9,13 +10,26 @@ class VertexService:
             project=settings.GOOGLE_CLOUD_PROJECT,
             location=settings.GOOGLE_CLOUD_LOCATION
         )
+        self.bucket_name = settings.GOOGLE_CLOUD_BUCKET_NAME
 
     async def generate_video_content(self, prompt: str, image_data: bytes = None):
         # gen vid
-        return "test_vid_id"
+        operation = self.client.models.generate_videos(
+            model="veo-3.1-generate-001",
+            prompt="a cat reading a book",
+            config=GenerateVideosConfig(
+                aspect_ratio="16:9",
+                output_gcs_uri=f"gs://{self.bucket_name}/videos/",
+            ),
+        )
+
+        return operation
     
-    async def get_video_status(self, video_id: str):
-        return "waiting"
+    async def get_video_status(self, operation: GenerateVideosOperation) -> JobStatus:
+        operation = self.client.operations.get(operation)
+        if operation.done:
+            return JobStatus(status="done", job_start_time=None, video_url=operation.result.generated_videos[0].video.uri)
+        return JobStatus(status="waiting", job_start_time=None, video_url=None)
     
     async def test_service(self):
         return self.client.models.generate_content(
