@@ -2,8 +2,8 @@ import { Tldraw } from "tldraw";
 import "tldraw/tldraw.css";
 import { useCanvas } from "../hooks/useCanvas";
 import { CanvasToolbar } from "../components/canvas/CanvasToolbar";
-import { FrameShapeUtil } from "../shapes/FrameShape";
-import { GlobalContextFrameShapeUtil } from "../shapes/GlobalContextFrameShape";
+import { FrameShapeUtil, GlobalContextFrameShapeUtil } from "../components/canvas/VideoCanvasComponent";
+import { VideoGenerationManager } from "../components/canvas/VideoGenerationManager";
 import { ArrowActionMenu } from "../components/canvas/ArrowActionMenu";
 const customShapeUtils = [FrameShapeUtil, GlobalContextFrameShapeUtil];
 
@@ -16,8 +16,9 @@ export default function Canvas() {
       <Tldraw 
         onMount={handleMount} 
         shapeUtils={customShapeUtils}
-        persistenceKey="hack-western-canvas-v1"
+        persistenceKey="hack-western-canvas-v3"
       >
+        <VideoGenerationManager />
         <ArrowActionMenu />
       </Tldraw>
       <CanvasToolbar

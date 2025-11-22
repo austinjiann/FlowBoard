@@ -1,4 +1,4 @@
-import { useEditor, useValue, TLShapeId, createShapeId, TLShapePartial, createBindingId, AssetRecordType, TLImageAsset } from 'tldraw'
+import { useEditor, useValue, TLShapeId, createShapeId, TLShapePartial, AssetRecordType, TLImageAsset } from 'tldraw'
 import { Tooltip, Button, Flex, TextField, Slider } from "@radix-ui/themes";
 import { Sparkles, Image as ImageIcon, Palette, Type, Eye } from "lucide-react";
 import { useState, useRef } from "react";
@@ -9,6 +9,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     const [nameValue, setNameValue] = useState("");
     const [showOpacitySlider, setShowOpacitySlider] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
     
     // Check if this specific shape is selected
     const isSelected = useValue(
@@ -156,95 +157,114 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
         const currentFrame = editor.getShape(shapeId);
         if (!currentFrame) return;
 
-        const FRAME_WIDTH = 1920;
-        const FRAME_HEIGHT = 1080;
-        const GAP = 200;
+        // Deselect the shape so the toolbar is not captured in the image
+        editor.selectNone();
 
-        const currentW = "w" in currentFrame.props ? (currentFrame.props.w as number) : FRAME_WIDTH;
-        const newX = currentFrame.x + currentW + GAP;
-        const newY = currentFrame.y;
+        // Get frame dimensions
+        const frameW = "w" in currentFrame.props ? (currentFrame.props.w as number) : 960;
+        const frameH = "h" in currentFrame.props ? (currentFrame.props.h as number) : 540;
 
-        const newFrameId = createShapeId();
-        const newFrame: TLShapePartial = {
-            id: newFrameId,
-            type: "aspect-frame",
-            x: newX,
-            y: newY,
-            props: {
-                w: FRAME_WIDTH,
-                h: FRAME_HEIGHT,
-                name: "16:9 Frame",
-                backgroundColor: "#ffffff",
-            },
-        };
-
-        const arrowId = createShapeId();
-        const arrow: TLShapePartial = {
-            id: arrowId,
-            type: "arrow",
-            x: currentFrame.x + currentW,
-            y: currentFrame.y + FRAME_HEIGHT / 2,
-            props: {
-                start: { x: 0, y: 0 },
-                end: { x: GAP, y: 0 },
-                kind: "elbow",
-            },
-        };
-
-        editor.createShapes([newFrame, arrow]);
+        const { blob } = await editor.toImage([shapeId], {
+            format: 'png',
+            scale: 1,
+            background: true,
+            padding: 0,
+        });
         
-        editor.createBindings([
-            {
-                id: createBindingId(),
-                typeName: 'binding',
+        // Reselect the shape
+        editor.select(shapeId);
+        
+        const backend_url = import.meta.env.VITE_BACKEND_URL || "";
+
+        const formData  = new FormData();
+      
+        formData.append("custom_prompt", ""); // empty for now, can use later
+        formData.append("global_context", ""); // also empty right now, populate later
+        formData.append("files", blob)
+
+        try {
+            const response = await fetch(`${backend_url}/api/jobs/video/mock`,{
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const jsonObj = await response.json();
+            if (jsonObj.job_id === undefined) {
+                throw Error("Server did not return job id")
+            }
+
+            const jobId = jsonObj.job_id;
+
+            // Create a new frame to the right
+            const newFrameId = createShapeId();
+            const gap = 2000;
+            const newFrameX = currentFrame.x + frameW + gap;
+            const newFrameY = currentFrame.y;
+
+            editor.createShapes([{
+                id: newFrameId,
+                type: 'aspect-frame',
+                x: newFrameX,
+                y: newFrameY,
+                props: {
+                    w: frameW,
+                    h: frameH,
+                    name: 'Generating...',
+                }
+            }]);
+
+            // Create an arrow connecting the frames
+            const arrowId = createShapeId();
+            editor.createShapes([{
+                id: arrowId,
+                type: 'arrow',
+                props: {
+                    start: { x: currentFrame.x + frameW, y: currentFrame.y + frameH / 2 },
+                    end: { x: newFrameX, y: newFrameY + frameH / 2 },
+                }
+            }]);
+
+            // Bind arrow to frames
+            editor.createBinding({
                 type: 'arrow',
                 fromId: arrowId,
                 toId: shapeId,
                 props: {
                     terminal: 'start',
-                    normalizedAnchor: { x: 1, y: 0.5 },
-                    isExact: true,
                     isPrecise: true,
-                },
-                meta: {},
-            },
-            {
-                id: createBindingId(),
-                typeName: 'binding',
+                }
+            });
+
+            editor.createBinding({
                 type: 'arrow',
                 fromId: arrowId,
                 toId: newFrameId,
                 props: {
                     terminal: 'end',
-                    normalizedAnchor: { x: 0, y: 0.5 },
-                    isExact: true,
                     isPrecise: true,
-                },
-                meta: {},
-            }
-        ]);
-        
-        editor.select(newFrameId);
-        editor.zoomToBounds(editor.getShapePageBounds(newFrameId)!, { animation: { duration: 200 } });
-
-        try {
-            const { blob } = await editor.toImage([shapeId], {
-                format: 'png',
-                scale: 1,
-                background: true,
-                padding: 0,
+                }
             });
-            
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `frame-${shapeId}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+
+            // Store job metadata in arrow's meta field
+            editor.updateShapes([{
+                id: arrowId,
+                type: 'arrow',
+                meta: {
+                    jobId,
+                    status: 'pending',
+                    videoUrl: null,
+                    timer: 0,
+                    startTime: Date.now(),
+                }
+            }]);
+
         } catch (error) {
-            console.error("Failed to save screenshot:", error);
+            console.error("Failed to generate video:", error);
+            // Optionally show an error toast or notification here
         }
     }
 
