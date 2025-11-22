@@ -2,14 +2,14 @@ import { Tldraw } from "tldraw";
 import "tldraw/tldraw.css";
 import { useCanvas } from "../hooks/useCanvas";
 import { CanvasToolbar } from "../components/canvas/CanvasToolbar";
-import { FrameShapeUtil, GlobalContextFrameShapeUtil } from "../components/canvas/VideoCanvasComponent";
+import { FrameShapeUtil } from "../components/canvas/VideoCanvasComponent";
 import { VideoGenerationManager } from "../components/canvas/VideoGenerationManager";
 import { ArrowActionMenu } from "../components/canvas/ArrowActionMenu";
-const customShapeUtils = [FrameShapeUtil, GlobalContextFrameShapeUtil];
+const customShapeUtils = [FrameShapeUtil];
 
 
 export default function Canvas() {
-  const { handleMount, handleImport, handleClear, createGlobalContextFrame, editorRef } = useCanvas();
+  const { handleMount, handleImport, handleClear, editorRef } = useCanvas();
 
   return (
     <div style={{ position: "fixed", inset: 0 }}>
@@ -24,7 +24,6 @@ export default function Canvas() {
       <CanvasToolbar
         onClear={handleClear}
         onImport={handleImport}
-        onCreateGlobalContextFrame={createGlobalContextFrame}
         editorRef={editorRef}
       />
     </div>

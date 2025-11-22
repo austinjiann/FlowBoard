@@ -7,14 +7,12 @@ import { mergeVideosClient, downloadVideo, type VideoClip } from "../../utils/vi
 interface CanvasToolbarProps {
   onClear: () => void;
   onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onCreateGlobalContextFrame: () => void;
   editorRef: React.RefObject<Editor | null>;
 }
 
 export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   onClear,
   onImport,
-  onCreateGlobalContextFrame,
   editorRef,
 }) => {
   const [isMerging, setIsMerging] = useState(false);
@@ -112,13 +110,6 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
                     }}
                     onChange={onImport}
                 />
-            </Button>
-        </Tooltip>
-
-        <Tooltip content="Create Global Context Frame">
-            <Button variant="soft" color="blue" onClick={onCreateGlobalContextFrame} style={{ cursor: 'pointer' }}>
-                <FileText size={16} />
-                Global Context
             </Button>
         </Tooltip>
 

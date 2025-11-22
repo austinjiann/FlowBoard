@@ -300,49 +300,10 @@ export const useCanvas = () => {
     
   }, [createFrame]);
 
-  const createGlobalContextFrame = useCallback((position?: { x: number; y: number }) => {
-    if (!editorRef.current) return;
-    const editor = editorRef.current;
-    
-    // Check if a global context frame already exists
-    const existingGCF = editor.getCurrentPageShapes().find(s => s.type === 'global-context-frame');
-    if (existingGCF) {
-      // If one exists, select it and zoom to it instead of creating a new one
-      editor.select(existingGCF.id);
-      editor.zoomToBounds(editor.getShapePageBounds(existingGCF.id)!, { animation: { duration: 200 } });
-      return existingGCF.id;
-    }
-    
-    const shapeId = createShapeId();
-
-    const x = position?.x ?? 100;
-    const y = position?.y ?? 100;
-
-    const shape: TLShapePartial = {
-      id: shapeId,
-      type: "global-context-frame",
-      x,
-      y,
-      props: {
-        w: 2000,
-        h: 2400,
-        title: "Global Context Frame",
-        backgroundColor: "#f8f9fa",
-      },
-    };
-
-    editor.createShapes([shape]);
-    editor.select(shapeId);
-    editor.zoomToBounds(editor.getShapePageBounds(shapeId)!, { animation: { duration: 200 } });
-
-    return shapeId;
-  }, []);
-
   return {
     handleMount,
     handleImport,
     handleClear,
-    createGlobalContextFrame,
     editorRef, // Expose editor ref for components outside Tldraw context
   };
 };
