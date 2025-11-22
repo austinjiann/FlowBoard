@@ -76,24 +76,34 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
     }
   };
 
-  return (
+    return (
     <div
-      className="absolute top-4 left-1/2 -translate-x-1/2 z-50"
+      className="absolute top-[12px] left-1/2 -translate-x-1/2 z-50"
     >
       <Flex 
         gap="3" 
         p="2" 
-        className="bg-white rounded-lg shadow-lg border border-gray-200"
+        className="rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-xl bg-white/40"
       >
         <Tooltip content="Clear Canvas">
-            <Button variant="soft" color="red" onClick={onClear} style={{ cursor: 'pointer' }}>
+            <Button 
+                variant="surface" 
+                color="red" 
+                onClick={onClear} 
+                style={{ cursor: 'pointer' }}
+                className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all"
+            >
                 <Eraser size={16} />
                 Clear
             </Button>
         </Tooltip>
         
         <Tooltip content="Import Image">
-            <Button variant="surface" style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}>
+            <Button 
+                variant="surface" 
+                style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+                className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all"
+            >
                 <ImageIcon size={16} />
                 Import
                 <input
@@ -115,11 +125,12 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
 
         <Tooltip content="Merge All Videos">
             <Button 
-              variant="soft" 
+              variant="surface" 
               color="green" 
               onClick={handleMergeVideos} 
               disabled={isMerging}
               style={{ cursor: isMerging ? 'not-allowed' : 'pointer' }}
+              className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all"
             >
                 <Video size={16} />
                 {isMerging ? `Merging... ${Math.round(mergeProgress * 100)}%` : 'Merge Videos'}

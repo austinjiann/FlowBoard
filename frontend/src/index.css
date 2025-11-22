@@ -29,3 +29,115 @@ body {
     font-family: 'Inter', sans-serif;
     overscroll-behavior: none;
 }
+
+/* Tldraw Overrides - Grid */
+.tl-container {
+    --tl-grid: #9ca3af;
+    --color-grid: #9ca3af;
+}
+
+/* Modern Glass UI for Top Left Menu */
+.tlui-menu-zone {
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+    border-radius: 16px !important;
+    margin: 12px !important;
+    padding: 6px !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure buttons inside don't block the glass */
+.tlui-menu-zone .tlui-button,
+.tlui-menu-zone .tlui-menu-button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 10px !important;
+}
+
+.tlui-menu-zone .tlui-button:hover,
+.tlui-menu-zone .tlui-menu-button:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Hide Garbage and Copy icons from Top Left Menu */
+button[data-testid="delete"],
+button[data-testid="duplicate"],
+button[data-testid="quick-actions.delete"],
+button[data-testid="quick-actions.duplicate"],
+/* Fallback for icon based selection if testids missing */
+.tlui-menu-zone button[title="Delete"],
+.tlui-menu-zone button[title="Duplicate"] {
+    display: none !important;
+}
+
+/* Hide Zoom/Navigation Menu in Bottom Left - Aggressive Wildcard */
+div[class*="bottom-left"],
+div[class*="navigation-zone"],
+div[class*="zoom-menu"],
+button[data-testid="zoom-menu.button"],
+button[aria-label*="Zoom"],
+[data-testid="minimap"],
+[data-testid="minimap.toggle"],
+[data-testid="minimap-toggle-button"],
+button[title="Toggle minimap"],
+button[aria-label="Toggle minimap"],
+.tlui-debug-panel,
+.tlui-debug-menu,
+.tlui-help-menu,
+[data-testid="help-menu"],
+[data-testid="navigation-panel"],
+.tlui-navigation-panel,
+[class*="zone--bottom-left"],
+button[title="Zoom"],
+button[title="Mini-map"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Style Back to Content button */
+.tlui-back-to-content,
+div[class*="back-to-content"],
+button[class*="back-to-content"],
+button[aria-label*="Back to content"],
+button[title*="Back to content"],
+[data-testid="back-to-content"],
+[data-testid="action.back-to-content"],
+button[data-testid="action.back-to-content"],
+*[data-testid*="back-to-content"],
+*[class*="back-to-content"],
+*[aria-label="Back to content"] {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    
+    /* Match Modern Glass UI */
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 8px 16px !important;
+    color: #000 !important;
+    font-weight: 500 !important;
+    
+    /* Position Fix */
+    position: absolute !important;
+    top: 80px !important;
+    left: 12px !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+    transform: none !important;
+}
