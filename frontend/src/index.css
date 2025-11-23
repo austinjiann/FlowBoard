@@ -156,11 +156,6 @@ button[data-testid="action.back-to-content"],
     transform: none !important;
 }
 
-.tl-watermark_SEE-LICENSE{
-    display: none !important; /* secret tech */
-}
-
-
 /* Blur Pulse Animation */
 @keyframes blur-pulse {
     0% {
