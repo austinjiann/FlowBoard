@@ -9,7 +9,7 @@ const customShapeUtils = [FrameShapeUtil];
 
 
 export default function Canvas() {
-  const { handleMount, handleImport, handleClear, editorRef } = useCanvas();
+  const { handleMount, handleClear, editorRef } = useCanvas();
 
   return (
     <div style={{ position: "fixed", inset: 0 }}>
@@ -17,13 +17,18 @@ export default function Canvas() {
         onMount={handleMount} 
         shapeUtils={customShapeUtils}
         persistenceKey="hack-western-canvas-v3"
+        components={{
+          InFrontOfTheCanvas: () => (
+            <>
+              <VideoGenerationManager />
+              <ArrowActionMenu />
+            </>
+          ),
+        }}
       >
-        <VideoGenerationManager />
-        <ArrowActionMenu />
       </Tldraw>
       <CanvasToolbar
         onClear={handleClear}
-        onImport={handleImport}
         editorRef={editorRef}
       />
     </div>

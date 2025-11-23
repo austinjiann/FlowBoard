@@ -2,6 +2,7 @@ import { useEditor, useValue, TLShapeId, createShapeId, TLShapePartial, AssetRec
 import { Tooltip, Button, Flex, TextField, Slider } from "@radix-ui/themes";
 import { Sparkles, Image as ImageIcon, Palette, Type, Eye } from "lucide-react";
 import { useState, useRef } from "react";
+import { toast } from 'sonner';
 
 export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     const editor = useEditor()
@@ -271,7 +272,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
 
         } catch (error) {
             console.error("Failed to generate video:", error);
-            // Optionally show an error toast or notification here
+            toast.error('Unexpected server error');
         }
     }
 

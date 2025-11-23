@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import { Button, Flex, Tooltip } from "@radix-ui/themes";
-import { Eraser, Image as ImageIcon, FileText, Video } from "lucide-react";
+import { Eraser, Video } from "lucide-react";
 import { Editor } from "tldraw";
 import { mergeVideosClient, downloadVideo, type VideoClip } from "../../utils/videoMergeUtils";
 
 interface CanvasToolbarProps {
   onClear: () => void;
-  onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editorRef: React.RefObject<Editor | null>;
 }
 
 export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   onClear,
-  onImport,
   editorRef,
 }) => {
   const [isMerging, setIsMerging] = useState(false);
@@ -78,7 +76,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
 
     return (
     <div
-      className="absolute top-[12px] left-1/2 -translate-x-1/2 z-50"
+      className="absolute top-3 left-1/2 -translate-x-1/2 z-50"
     >
       <Flex 
         gap="3" 
@@ -95,31 +93,6 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             >
                 <Eraser size={16} />
                 Clear
-            </Button>
-        </Tooltip>
-        
-        <Tooltip content="Import Image">
-            <Button 
-                variant="surface" 
-                style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
-                className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all"
-            >
-                <ImageIcon size={16} />
-                Import
-                <input
-                    type="file"
-                    accept="image/*"
-                    style={{ 
-                        position: 'absolute', 
-                        top: 0, 
-                        left: 0, 
-                        width: '100%', 
-                        height: '100%', 
-                        opacity: 0, 
-                        cursor: 'pointer' 
-                    }}
-                    onChange={onImport}
-                />
             </Button>
         </Tooltip>
 

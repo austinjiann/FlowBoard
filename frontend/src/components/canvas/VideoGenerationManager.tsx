@@ -1,11 +1,13 @@
 import { useEditor, createShapeId, AssetRecordType, TLImageAsset } from 'tldraw'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 
 export const VideoGenerationManager = () => {
     const editor = useEditor()
+    const intervalRef = useRef<number | null>(null)
 
     useEffect(() => {
-        const interval = setInterval(async () => {
+        intervalRef.current = setInterval(async () => {
             // Find all arrows with pending video generation jobs
             const arrows = editor.getCurrentPageShapes().filter(
                 s => s.type === 'arrow' && s.meta?.jobId && s.meta?.status === 'pending'
@@ -17,7 +19,29 @@ export const VideoGenerationManager = () => {
                 
                 try {
                     const response = await fetch(`${backend_url}/api/jobs/video/${jobId}`)
-                    if (!response.ok) continue
+                    if (!response.ok) {
+                        // Show error toast
+                        toast.error('Unexpected server error')
+                        
+                        // Clear the interval
+                        if (intervalRef.current) {
+                            clearInterval(intervalRef.current)
+                            intervalRef.current = null
+                        }
+                        
+                        // Find and delete the arrow
+                        editor.deleteShapes([arrow.id])
+                        
+                        // Find and delete the target frame
+                        const bindings = editor.getBindingsInvolvingShape(arrow.id)
+                        const endBinding = bindings.find((b: any) => b.fromId === arrow.id && b.props.terminal === 'end')
+                        if (endBinding) {
+                            const targetFrameId = (endBinding as any).toId
+                            editor.deleteShapes([targetFrameId])
+                        }
+                        
+                        continue
+                    }
 
                     const data = await response.json()
                     
@@ -165,7 +189,11 @@ export const VideoGenerationManager = () => {
             }
         }, 2000) // Poll every 2s
 
-        return () => clearInterval(interval)
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current)
+            }
+        }
     }, [editor])
 
     return null
