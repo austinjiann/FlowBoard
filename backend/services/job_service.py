@@ -45,8 +45,8 @@ class JobService:
             job_start_time=datetime.now()
         )
         
-        # Store in Redis
-        self.redis_client.set(f"job:{job_id}", self._serialize_job(job))
+        # Store in Redis with 20 minute TTL
+        self.redis_client.setex(f"job:{job_id}", 1200, self._serialize_job(job))
         
         return job_id
 
