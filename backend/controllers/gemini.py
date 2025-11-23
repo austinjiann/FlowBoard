@@ -66,13 +66,8 @@ class Gemini(APIController):
     @post("/image")
     async def generate_image(self, request: Request):
         try:
-            multipart = await request.multipart()
-            
-            image_data = None
-            async for part in multipart:
-                if part.name == "image":
-                    image_data = await part.read()
-                    break
+            files = await request.files()
+            image_data = files[0]
             
             if not image_data:
                 return json({"error": "No image file provided"}, status=400)
