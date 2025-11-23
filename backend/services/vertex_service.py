@@ -1,5 +1,5 @@
 from google import genai
-from google.genai.types import GenerateVideosConfig, GenerateVideosOperation, Image
+from google.genai.types import GenerateVideosConfig, GenerateVideosOperation, Image, GenerateContentConfig, ImageConfig, Part
 from models.job import JobStatus
 from utils.env import settings
 
@@ -25,10 +25,31 @@ class VertexService:
                 aspect_ratio="16:9",
                 duration_seconds=6,
                 output_gcs_uri=f"gs://{self.bucket_name}/videos/",
+                negative_prompt="text, annotations, low quality",
             ),
         )
 
         return operation
+    
+    async def generate_image_content(self, prompt: str, image: bytes) -> str:
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash-image",
+            contents=[
+                Part.from_bytes(
+                    data=image,
+                    mime_type="image/png",
+                ),
+                prompt,
+            ],
+            config=GenerateContentConfig(
+                response_modalities=["IMAGE"],
+                image_config=ImageConfig(
+                    aspect_ratio="16:9",
+                ),
+                candidate_count=1,
+            ),
+        )
+        return response.candidates[0].content.parts[0].inline_data.data
     
     async def get_video_status(self, operation: GenerateVideosOperation) -> JobStatus:
         operation = self.client.operations.get(operation)

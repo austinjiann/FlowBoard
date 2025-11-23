@@ -7,7 +7,7 @@ import json as pyjson
 
 from services.vertex_service import VertexService
 
-class GeminiController(APIController):
+class Gemini(APIController):
     
     def __init__(self, vertex_service: VertexService):
         self.vertex_service = vertex_service
@@ -58,3 +58,19 @@ class GeminiController(APIController):
 
         finally:
             os.remove(tmp_path)
+
+    @post("/image")
+    async def generate_image(self, image: FromFiles):
+        if not image.value:
+            return json({"error": "No image file provided"}, status=400)
+
+        image_file = image.value[0]
+
+        prompt = "Improve the attached image. Do not deviate from the original art style too much, simply understand the artist's idea and enhance it a bit."
+
+        res = await self.vertex_service.generate_image_content(
+            prompt=prompt,
+            image=image_file.data
+        )
+
+        return json({"image_bytes": res})
