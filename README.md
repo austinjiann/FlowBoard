@@ -1,5 +1,5 @@
 # FlowBoard 
-https://youtu.be/HGY6VDGjD7U?si=IhjAdg-0ZVuD1NZ1
+[![FlowBoard Demo](https://img.youtube.com/vi/HGY6VDGjD7U/maxresdefault.jpg)](https://www.youtube.com/watch?v=HGY6VDGjD7U)
 ![landing](https://github.com/user-attachments/assets/c5f30c0d-bfd5-4402-b5c0-0604b1b525cd)
 
 
