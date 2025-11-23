@@ -3,6 +3,7 @@ import { Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Dialog from '@radix-ui/react-dialog';
 import { NavItem } from '../../types/types';
+import logoImage from '../../assets/images/logo.png';
 
 const navItems: NavItem[] = [];
 
@@ -30,7 +31,12 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group cursor-pointer">
-            <span className={`font-bold tracking-tight text-gray-900 transition-all ${isScrolled ? 'text-base' : 'text-xl'}`}>
+            <img 
+              src={logoImage} 
+              alt="FlowBoard Logo" 
+              className={`transition-all ${isScrolled ? 'h-8 w-8' : 'h-10 w-10'}`}
+            />
+            <span className={`font-bold tracking-tight text-gray-900 transition-all ${isScrolled ? 'text-lg' : 'text-2xl'}`}>
               FlowBoard
             </span>
           </Link>

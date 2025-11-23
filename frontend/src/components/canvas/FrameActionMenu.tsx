@@ -591,8 +591,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     const frameWidth = "w" in frame.props ? (frame.props.w as number) : 960;
     
     // Scale text box size based on frame width
-    const textBoxWidth = Math.max(400, Math.min(frameWidth * 0.9, 1200));
-    const textBoxPadding = Math.max(16, frameWidth * 0.02);
+    const textBoxWidth = frameWidth;
     const fontSize = Math.max(14, Math.min(frameWidth * 0.025, 24));
 
     const handleOpacityChange = (value: number[]) => {
@@ -799,21 +798,24 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                 onPointerDown={(e) => e.stopPropagation()}
             >
                 <div 
-                    className="bg-white rounded-full shadow-lg border border-gray-200"
+                    className="bg-white rounded-full shadow-xl flex items-center border border-gray-100"
                     style={{ 
-                        minWidth: `${textBoxWidth}px`,
-                        paddingLeft: `${textBoxPadding}px`,
-                        paddingRight: `${textBoxPadding}px`,
-                        paddingTop: `${textBoxPadding * 0.625}px`,
-                        paddingBottom: `${textBoxPadding * 0.625}px`,
+                        width: `${textBoxWidth}px`,
+                        padding: '12px 24px',
                     }}
                 >
-                    <TextField.Root
-                        size="3"
+                    <input
+                        type="text"
                         value={promptText}
                         onChange={(e) => setPromptText(e.target.value)}
-                        placeholder="Enter your prompt..."
-                        style={{ width: '100%', border: 'none', outline: 'none', fontSize: `${fontSize}px` }}
+                        placeholder="Describe your image..."
+                        className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-400"
+                        style={{ fontSize: `${fontSize}px` }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleGenerate(e as any);
+                            }
+                        }}
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
