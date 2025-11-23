@@ -15,10 +15,11 @@ class Gemini(APIController):
             # Parse multipart form data manually
             files = await request.files()
             
+            if not files:
+                return json({"error": "No video file provided"}, status=400)
+            
             video_data = files[0]
             
-            if not video_data:
-                return json({"error": "No video file provided"}, status=400)
             
             prompt = (
                 "Extract structured scene information from this video.\n"
@@ -67,16 +68,17 @@ class Gemini(APIController):
     async def generate_image(self, request: Request):
         try:
             files = await request.files()
-            image_data = files[0]
             
-            if not image_data:
+            if not files:
                 return json({"error": "No image file provided"}, status=400)
+            
+            image_data = files[0]
 
             prompt = "Improve the attached image. Do not deviate from the original art style too much, simply understand the artist's idea and enhance it a bit."
 
             res = await self.vertex_service.generate_image_content(
                 prompt=prompt,
-                image=image_data
+                image=image_data.data
             )
 
             return json({"image_bytes": res})
