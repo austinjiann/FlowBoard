@@ -1,5 +1,8 @@
 # FlowBoard 
 
+![landing](https://github.com/user-attachments/assets/c5f30c0d-bfd5-4402-b5c0-0604b1b525cd)
+
+
 **Direct Your Video Frame by Frame**
 
 FlowBoard is an AI-powered video storyboard creation tool that transforms your rough sketches and instructions into context-aware video clips. Create storyboards by drawing directly on images, and watch as FlowBoard generates seamless video sequences that extend infinitely.
@@ -15,31 +18,7 @@ FlowBoard is an AI-powered video storyboard creation tool that transforms your r
 - **Real-time Preview**: See your video generation progress in real-time
 
 ## Tech Stack
-
-### Frontend
-- **React 18** with TypeScript
-- **Tldraw 4.2** - Interactive whiteboard/canvas
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Styling
-- **Radix UI** - Component library
-- **Sonner** - Toast notifications
-
-### Backend
-- **Python 3** with BlackSheep (async web framework)
-- **Google Vertex AI** - Video generation (Veo 3.1)
-- **Google Cloud Storage** - File storage
-- **Redis** - Job queue and caching
-- **Uvicorn** - ASGI server
-
-## Prerequisites
-
-- Node.js 18+ and npm/yarn
-- Python 3.10+
-- Google Cloud account with:
-  - Vertex AI API enabled
-  - Cloud Storage bucket created
-  - Service account with appropriate permissions
-- Redis server (for job queue)
+![tech stack](https://github.com/user-attachments/assets/8208f04a-7408-4dfc-a809-7dc39c2be4f3)
 
 ## Setup
 
