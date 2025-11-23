@@ -11,7 +11,7 @@ import {
     TLShape,
 } from 'tldraw'
 import { FrameActionMenu } from '../components/canvas/FrameActionMenu'
-import { Loader2 } from 'lucide-react'
+// import { Loader2 } from 'lucide-react'
 
 export type IFrameShape = TLBaseShape<
 	'aspect-frame',
@@ -85,7 +85,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
                             this.editor.select(shape.id);
                         }
                     }}
-                    onPointerDown={(e) => {
+                    onPointerDown={(_e) => {
                         // Don't stop propagation - let clicks through to children
                         // But capture the click for selection purposes
                         this.editor.select(shape.id);

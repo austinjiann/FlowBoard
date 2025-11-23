@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, PenTool, Layers, Film } from 'lucide-react';
+import { PenTool, Layers, Film } from 'lucide-react';
 import * as Tabs from '@radix-ui/react-tabs';
 
 const DemoSection: React.FC = () => {

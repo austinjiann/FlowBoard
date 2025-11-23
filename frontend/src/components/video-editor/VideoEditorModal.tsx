@@ -74,9 +74,9 @@ const VideoEditorModal: FC<VideoEditorModalProps> = ({
 		setIsPlaying(playing);
 	}, []);
 
-	const handleTimeUpdate = useCallback((time: number) => {
-		setCurrentTime(time);
-	}, []);
+  // const handleTimeUpdate = useCallback((time: number) => {
+  //   setCurrentTime(time);
+  // }, []);
 
 	const handleDurationChange = useCallback((newDuration: number) => {
 		// VideoPlayer reports effective duration (trimEnd if set, otherwise full duration)

@@ -81,7 +81,7 @@ export async function mergeVideosClient(
       resolve(blob);
     };
 
-    mediaRecorder.onerror = (event) => {
+    mediaRecorder.onerror = (_event) => {
       reject(new Error("MediaRecorder error"));
     };
 
@@ -131,8 +131,8 @@ export async function mergeVideosClient(
         // Play the video
         await video.play();
 
-        const startTime = Date.now();
-        const clipDuration = trimEnd * 1000; // Convert to milliseconds
+        // const startTime = Date.now();
+        // const clipDuration = trimEnd * 1000; // Convert to milliseconds
 
         const drawFrame = () => {
           const currentTime = video.currentTime;
