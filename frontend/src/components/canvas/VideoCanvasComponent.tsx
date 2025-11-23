@@ -49,7 +49,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
 		return new Rectangle2d({
 			width: shape.props.w,
 			height: shape.props.h,
-			isFilled: true,
+			isFilled: false,
 		})
 	}
 
@@ -141,7 +141,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
     }
 
 	override canReceiveNewChildrenOfType(_shape: IFrameShape, type: TLShape['type']) {
-		return type !== 'aspect-frame'
+		return type !== 'aspect-frame' && type !== 'arrow'
 	}
 
 	override onDropShapesOver(shape: IFrameShape, shapes: TLShape[]) {

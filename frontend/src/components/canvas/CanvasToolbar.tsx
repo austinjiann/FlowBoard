@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Flex, Tooltip } from "@radix-ui/themes";
 import { Eraser, Video } from "lucide-react";
 import { Editor } from "tldraw";
+import { toast } from "sonner";
 import { mergeVideosClient, downloadVideo, type VideoClip } from "../../utils/videoMergeUtils";
 
 interface CanvasToolbarProps {
@@ -18,7 +19,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
 
   const handleMergeVideos = async () => {
     if (!editorRef.current) {
-      alert("Editor not ready. Please wait a moment and try again.");
+      toast.error("Editor not ready. Please wait a moment and try again.");
       return;
     }
 
@@ -30,7 +31,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
     );
 
     if (arrows.length === 0) {
-      alert("No videos found. Please generate or add videos first.");
+      toast.error("No videos found. Please generate or add videos first.");
       return;
     }
 
@@ -64,10 +65,10 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
 
       // Download the merged video
       downloadVideo(mergedBlob, `merged-video-${Date.now()}.webm`);
-      alert(`Successfully merged ${clips.length} videos!`);
+      toast.success(`Successfully merged ${clips.length} video${clips.length === 1 ? '' : 's'}!`);
     } catch (error) {
       console.error("Merge failed:", error);
-      alert(`Failed to merge videos: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Failed to merge videos: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsMerging(false);
       setMergeProgress(0);

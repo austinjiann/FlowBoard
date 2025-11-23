@@ -1,6 +1,6 @@
 import { useEditor, useValue, TLShapeId, createShapeId, TLShapePartial, AssetRecordType, TLImageAsset } from 'tldraw'
-import { Tooltip, Button, Flex, TextField, Slider } from "@radix-ui/themes";
-import { Sparkles, Image as ImageIcon, Palette, Type, Eye, Banana, Loader2 } from "lucide-react";
+import { Tooltip, Button, Flex, TextField } from "@radix-ui/themes";
+import { Sparkles, Image as ImageIcon, Palette, Type, Banana, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from 'sonner';
 
@@ -8,7 +8,6 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     const editor = useEditor()
     const [isEditingName, setIsEditingName] = useState(false);
     const [nameValue, setNameValue] = useState("");
-    const [showOpacitySlider, setShowOpacitySlider] = useState(false);
     const [promptText, setPromptText] = useState("");
     const [isImproving, setIsImproving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -180,7 +179,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
             editor.updateInstanceState({ isReadonly: false });
             
             if (!blob) {
-                alert("Failed to export frame as image");
+                toast.error("Failed to export frame as image");
                 return;
             }
 
@@ -196,7 +195,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
             });
 
             if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
+                throw new Error("Failed to improve image");
             }
 
             const result = await response.json();
@@ -425,7 +424,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
             }]);
             editor.updateInstanceState({ isReadonly: false });
         } catch (error) {
-            alert(`Failed to improve frame: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            toast.error(`Failed to improve frame: ${error instanceof Error ? error.message : 'Unknown error'}`);
             setIsImproving(false);
             // Clear loading state from frame meta
             const errorFrame = editor.getShape(shapeId);
@@ -506,7 +505,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
             });
 
             if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
+                throw new Error("Failed to generate video");
             }
 
             const jsonObj = await response.json();
@@ -515,6 +514,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
             }
 
             const jobId = jsonObj.job_id;
+            const pageId = editor.getCurrentPageId();
 
             // Create a new frame to the right
             const newFrameId = createShapeId();
@@ -527,6 +527,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                 type: 'aspect-frame',
                 x: newFrameX,
                 y: newFrameY,
+                parentId: pageId,
                 props: {
                     w: frameW,
                     h: frameH,
@@ -539,6 +540,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
             editor.createShapes([{
                 id: arrowId,
                 type: 'arrow',
+                parentId: pageId,
                 props: {
                     start: { x: currentFrame.x + frameW, y: currentFrame.y + frameH / 2 },
                     end: { x: newFrameX, y: newFrameY + frameH / 2 },
@@ -581,29 +583,17 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
 
         } catch (error) {
             console.error("Failed to generate video:", error);
-            toast.error('Unexpected server error');
+            toast.error("Failed to generate video");
         }
     }
 
     const backgroundColor = "backgroundColor" in frame.props ? (frame.props.backgroundColor as string) : "#ffffff";
-    const opacity = "opacity" in frame.props ? (frame.props.opacity as number) : 1;
     const frameHeight = "h" in frame.props ? (frame.props.h as number) : 540;
     const frameWidth = "w" in frame.props ? (frame.props.w as number) : 960;
     
     // Scale text box size based on frame width
     const textBoxWidth = frameWidth;
     const fontSize = Math.max(14, Math.min(frameWidth * 0.025, 24));
-
-    const handleOpacityChange = (value: number[]) => {
-        editor.updateShapes([{
-            id: shapeId,
-            type: 'aspect-frame',
-            props: {
-                ...frame.props,
-                opacity: value[0],
-            },
-        }]);
-    };
 
     return (
         <>
@@ -727,18 +717,6 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                         </Button>
                     </Tooltip>
 
-                    {/* Opacity Control */}
-                    <Tooltip content="Opacity">
-                        <Button 
-                            variant="soft" 
-                            size="3"
-                            onClick={() => setShowOpacitySlider(!showOpacitySlider)}
-                            style={{ cursor: 'pointer', minWidth: '48px', minHeight: '48px' }}
-                        >
-                            <Eye size={40} />
-                        </Button>
-                    </Tooltip>
-
                     <Tooltip content="Improve Frame">
                         <Button 
                             variant="soft" 
@@ -756,34 +734,6 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                     </Tooltip>
                 </Flex>
             </div>
-            )}
-
-            {/* Opacity Slider - appears above toolbar when button is clicked */}
-            {showOpacitySlider && (
-                <div 
-                    className="absolute -top-60 left-1/2 -translate-x-1/2 pointer-events-auto z-50"
-                    onPointerDown={(e) => e.stopPropagation()}
-                >
-                    <div 
-                        className="bg-white rounded-lg shadow-lg border border-gray-200 p-4"
-                        style={{ minWidth: '600px' }}
-                    >
-                        <label style={{ fontSize: '20px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '12px' }}>
-                            Opacity
-                        </label>
-                        <Slider
-                            value={[opacity]}
-                            onValueChange={handleOpacityChange}
-                            min={0}
-                            max={1}
-                            step={0.01}
-                            style={{ width: '600px' }}
-                        />
-                        <div style={{ fontSize: '15px', color: '#6b7280', marginTop: '4px', textAlign: 'center' }}>
-                            {Math.round(opacity * 100)}%
-                        </div>
-                    </div>
-        </div>
             )}
 
             {/* Prompt Text Box - appears below the frame */}

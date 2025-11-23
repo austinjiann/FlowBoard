@@ -114,8 +114,8 @@ export const VideoGenerationManager = () => {
                                                     const scaledW = video.videoWidth * scale
                                                     const scaledH = video.videoHeight * scale
                                                     
-                                                    const imageX = (frameW - scaledW) / 2
-                                                    const imageY = (frameH - scaledH) / 2
+                                                    const imageX = targetFrame.x + (frameW - scaledW) / 2
+                                                    const imageY = targetFrame.y + (frameH - scaledH) / 2
                                                     
                                                     const imageShapeId = createShapeId()
                                                     editor.createShapes([{
@@ -123,7 +123,6 @@ export const VideoGenerationManager = () => {
                                                         type: 'image',
                                                         x: imageX,
                                                         y: imageY,
-                                                        parentId: targetFrameId,
                                                         props: {
                                                             assetId,
                                                             w: scaledW,
