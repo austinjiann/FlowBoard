@@ -36,6 +36,7 @@ body {
     --color-grid: #9ca3af;
 }
 
+
 /* Modern Glass UI for Top Left Menu */
 .tlui-menu-zone {
     background: rgba(255, 255, 255, 0.4) !important;
@@ -70,6 +71,13 @@ button[data-testid="quick-actions.duplicate"],
 /* Fallback for icon based selection if testids missing */
 .tlui-menu-zone button[title="Delete"],
 .tlui-menu-zone button[title="Duplicate"] {
+    display: none !important;
+}
+
+/* Hide Eraser Tool from Toolbar */
+button[data-testid="tool.eraser"],
+button[data-testid="tools.eraser"],
+button[title="Eraser"] {
     display: none !important;
 }
 
