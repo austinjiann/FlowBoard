@@ -11,6 +11,7 @@ import {
     TLShape,
 } from 'tldraw'
 import { FrameActionMenu } from '../components/canvas/FrameActionMenu'
+import { Loader2 } from 'lucide-react'
 
 export type IFrameShape = TLBaseShape<
 	'aspect-frame',

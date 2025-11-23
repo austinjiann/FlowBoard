@@ -1,6 +1,6 @@
 import { useEditor, useValue, TLShapeId, createShapeId, TLShapePartial, AssetRecordType, TLImageAsset } from 'tldraw'
 import { Tooltip, Button, Flex, TextField, Slider } from "@radix-ui/themes";
-import { Sparkles, Image as ImageIcon, Palette, Type, Eye } from "lucide-react";
+import { Sparkles, Image as ImageIcon, Palette, Type, Eye, Banana, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from 'sonner';
 
@@ -10,6 +10,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     const [nameValue, setNameValue] = useState("");
     const [showOpacitySlider, setShowOpacitySlider] = useState(false);
     const [promptText, setPromptText] = useState("");
+    const [isImproving, setIsImproving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     
@@ -132,6 +133,314 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
             }
         };
         reader.readAsDataURL(file);
+    };
+
+
+    const handleImprove = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        const currentFrame = editor.getShape(shapeId);
+        if (!currentFrame) return;
+
+        setIsImproving(true);
+        
+        // Store loading state in frame meta so FrameShape can access it
+        editor.updateShapes([{
+            id: shapeId,
+            type: 'aspect-frame',
+            meta: {
+                ...currentFrame.meta,
+                isImproving: true,
+            },
+        }]);
+        
+        // Disable editor interactions while improving
+        editor.updateInstanceState({ isReadonly: true });
+        
+        try {
+            // Deselect the shape so the toolbar is not captured in the image
+            editor.selectNone();
+
+            // Get frame dimensions
+            const frameW = "w" in currentFrame.props ? (currentFrame.props.w as number) : 960;
+            const frameH = "h" in currentFrame.props ? (currentFrame.props.h as number) : 540;
+
+            // Export frame as image (readonly prevents user interaction during export)
+            const { blob } = await editor.toImage([shapeId], {
+                format: 'png',
+                scale: 1,
+                background: true,
+                padding: 0,
+            });
+            
+            // Reselect the shape
+            editor.select(shapeId);
+            
+            // Disable readonly now that export is done - we need to be able to delete/create shapes
+            editor.updateInstanceState({ isReadonly: false });
+            
+            if (!blob) {
+                alert("Failed to export frame as image");
+                return;
+            }
+
+            const backend_url = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
+            const formData = new FormData();
+            formData.append("image", blob, "frame.png");
+
+            // Call the improve image API (nanobanana)
+            const response = await fetch(`${backend_url}/api/gemini/image`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (!result.image_bytes) {
+                throw new Error("No image data returned from server");
+            }
+
+            // Handle bytes from backend - convert to base64
+            let imageDataUrl: string;
+            const imageBytes = result.image_bytes;
+            
+            let base64String: string;
+            
+            try {
+                if (Array.isArray(imageBytes)) {
+                    // Backend sent bytes as array of numbers, convert to base64
+                    const bytes = new Uint8Array(imageBytes);
+                    // Convert bytes to base64
+                    const binaryString = Array.from(bytes, byte => String.fromCharCode(byte)).join('');
+                    base64String = btoa(binaryString);
+                } else if (typeof imageBytes === 'string') {
+                    // Check if it's already a data URL
+                    if (imageBytes.startsWith('data:image/')) {
+                        // Extract just the base64 part
+                        const commaIndex = imageBytes.indexOf(',');
+                        if (commaIndex !== -1) {
+                            base64String = imageBytes.substring(commaIndex + 1);
+                        } else {
+                            base64String = imageBytes;
+                        }
+                    } else {
+                        // It's already a base64 string
+                        base64String = imageBytes;
+                    }
+                    // First, just remove whitespace
+                    let cleanedBase64 = base64String.replace(/[\s\r\n\t]/g, '');
+                    
+                    // Check if it's base64url (contains _ or -) and convert to standard base64
+                    if (cleanedBase64.includes('_') || cleanedBase64.includes('-')) {
+                        // Convert base64url to standard base64: - becomes +, _ becomes /
+                        cleanedBase64 = cleanedBase64.replace(/-/g, '+').replace(/_/g, '/');
+                        // Fix padding (base64url doesn't use = padding, but standard base64 does)
+                        const paddingNeeded = (4 - (cleanedBase64.length % 4)) % 4;
+                        if (paddingNeeded > 0) {
+                            cleanedBase64 += '='.repeat(paddingNeeded);
+                        }
+                    }
+                    
+                    // Try to decode it as-is first
+                    let canDecode = false;
+                    try {
+                        // Test if it can be decoded
+                        atob(cleanedBase64.substring(0, Math.min(100, cleanedBase64.length)));
+                        // If we get here, at least the start is valid
+                        canDecode = true;
+                    } catch (e) {
+                        // Will clean below
+                    }
+                    
+                    // If initial test passed, try the full string with padding fix
+                    if (canDecode) {
+                        // Fix padding if needed
+                        const paddingNeeded = (4 - (cleanedBase64.length % 4)) % 4;
+                        if (paddingNeeded > 0 && paddingNeeded < 4) {
+                            cleanedBase64 += '='.repeat(paddingNeeded);
+                        }
+                        // Try full decode
+                        try {
+                            atob(cleanedBase64);
+                            base64String = cleanedBase64;
+                        } catch (e) {
+                            canDecode = false;
+                        }
+                    }
+                    
+                    // Only clean invalid characters if decode failed
+                    if (!canDecode) {
+                        // Find invalid characters and their positions (sample first 1000 chars)
+                        const invalidChars = new Set<string>();
+                        const invalidPositions: number[] = [];
+                        for (let i = 0; i < Math.min(1000, cleanedBase64.length); i++) {
+                            const char = cleanedBase64[i];
+                            if (!/[A-Za-z0-9+/=]/.test(char)) {
+                                invalidChars.add(char);
+                                invalidPositions.push(i);
+                            }
+                        }
+                        
+                        // Remove invalid characters
+                        let testBase64 = cleanedBase64.replace(/[^A-Za-z0-9+/=]/g, '');
+                        const removedCount = cleanedBase64.length - testBase64.length;
+                        
+                        // Fix padding
+                        const paddingNeeded = (4 - (testBase64.length % 4)) % 4;
+                        if (paddingNeeded > 0 && paddingNeeded < 4) {
+                            testBase64 += '='.repeat(paddingNeeded);
+                        }
+                        
+                        // Test if this cleaned version can decode (test first chunk)
+                        try {
+                            const testChunk = testBase64.substring(0, Math.min(10000, testBase64.length));
+                            atob(testChunk);
+                            // If chunk test passes, try full decode
+                            try {
+                                atob(testBase64);
+                                base64String = testBase64;
+                            } catch (fullError) {
+                                // Use it anyway - might work for image loading
+                                base64String = testBase64;
+                            }
+                        } catch (e) {
+                            throw new Error(`Could not create valid base64 from response. Removed ${removedCount} invalid characters.`);
+                        }
+                    }
+                    
+                } else {
+                    throw new Error(`Invalid image data format: ${typeof imageBytes}. Expected array of bytes or base64 string.`);
+                }
+                
+                // Validate base64 string format
+                if (!base64String || base64String.length === 0) {
+                    throw new Error("Base64 string is empty after processing");
+                }
+                
+                // Use data URL (consistent with other image handling in the codebase)
+                // First validate the base64 can decode
+                try {
+                    // Test decode to ensure it's valid
+                    atob(base64String);
+                    imageDataUrl = `data:image/png;base64,${base64String}`;
+                } catch (decodeError) {
+                    throw new Error("Invalid base64 string - cannot decode image data");
+                }
+                
+            } catch (error) {
+                throw new Error(`Failed to process image data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+
+            // Validate the image loads correctly before creating the asset
+            await new Promise<void>((resolve, reject) => {
+                const img = new Image();
+                const timeout = setTimeout(() => {
+                    reject(new Error("Image load timeout - the image data may be corrupted"));
+                }, 10000);
+                
+                img.onload = () => {
+                    clearTimeout(timeout);
+                    resolve();
+                };
+                img.onerror = () => {
+                    clearTimeout(timeout);
+                    reject(new Error("Failed to load improved image - invalid image data"));
+                };
+                img.src = imageDataUrl;
+            });
+
+            // Get actual image dimensions
+            const img = new Image();
+            await new Promise<void>((resolve) => {
+                img.onload = () => resolve();
+                img.src = imageDataUrl;
+            });
+
+            // Create image asset from improved image
+            const assetId = AssetRecordType.createId();
+            const asset: TLImageAsset = {
+                id: assetId,
+                type: "image",
+                typeName: "asset",
+                props: {
+                    name: "improved-frame.png",
+                    src: imageDataUrl,
+                    w: img.width || frameW,
+                    h: img.height || frameH,
+                    mimeType: "image/png",
+                    isAnimated: false,
+                },
+                meta: {},
+            };
+
+            // Get child shapes to replace BEFORE creating new asset
+            const childIds = editor.getSortedChildIdsForParent(shapeId);
+
+            // Create new image shape with improved image
+            const imageShapeId = createShapeId();
+            const scale = Math.min(frameW / img.width, frameH / img.height);
+            const scaledW = img.width * scale;
+            const scaledH = img.height * scale;
+            const imageX = (frameW - scaledW) / 2;
+            const imageY = (frameH - scaledH) / 2;
+
+            const imageShape: TLShapePartial = {
+                id: imageShapeId,
+                type: "image",
+                parentId: shapeId,
+                x: imageX,
+                y: imageY,
+                props: {
+                    assetId,
+                    w: scaledW,
+                    h: scaledH,
+                },
+            };
+
+            // Delete existing children first (before creating new asset/shape)
+            if (childIds.length > 0) {
+                editor.deleteShapes(childIds);
+            }
+            
+            // Create new asset
+            editor.createAssets([asset]);
+            
+            // Create new image shape
+            editor.createShapes([imageShape]);
+
+            setIsImproving(false);
+            // Clear loading state from frame meta
+            editor.updateShapes([{
+                id: shapeId,
+                type: 'aspect-frame',
+                meta: {
+                    ...editor.getShape(shapeId)?.meta,
+                    isImproving: false,
+                },
+            }]);
+            editor.updateInstanceState({ isReadonly: false });
+        } catch (error) {
+            alert(`Failed to improve frame: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            setIsImproving(false);
+            // Clear loading state from frame meta
+            const errorFrame = editor.getShape(shapeId);
+            if (errorFrame) {
+                editor.updateShapes([{
+                    id: shapeId,
+                    type: 'aspect-frame',
+                    meta: {
+                        ...errorFrame.meta,
+                        isImproving: false,
+                    },
+                }]);
+            }
+            editor.updateInstanceState({ isReadonly: false });
+        }
     };
 
     const handleNameClick = (e: React.MouseEvent) => {
@@ -299,6 +608,8 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
 
     return (
         <>
+            {/* Loading overlay for improve frame operation */}
+
             {/* Toolbar above the frame */}
             {showToolbar && (
             <div 
@@ -426,6 +737,22 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                             style={{ cursor: 'pointer', minWidth: '48px', minHeight: '48px' }}
                         >
                             <Eye size={40} />
+                        </Button>
+                    </Tooltip>
+
+                    <Tooltip content="Improve Frame">
+                        <Button 
+                            variant="soft" 
+                            size="3"
+                            onClick={handleImprove}
+                            disabled={isImproving}
+                            style={{ cursor: isImproving ? 'not-allowed' : 'pointer', minWidth: '48px', minHeight: '48px', opacity: isImproving ? 0.6 : 1 }}
+                        >
+                            {isImproving ? (
+                                <Loader2 size={40} className="animate-spin" />
+                            ) : (
+                            <Banana size={40} />
+                            )}
                         </Button>
                     </Tooltip>
                 </Flex>
