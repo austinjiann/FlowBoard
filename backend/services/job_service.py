@@ -11,13 +11,7 @@ import pickle
 class JobService:
     def __init__(self, vertex_service: VertexService):
         self.vertex_service = vertex_service
-        self.redis_client = redis.Redis(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            username=settings.REDIS_USERNAME,
-            password=settings.REDIS_PASSWORD,
-            decode_responses=False
-        )
+        self.redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=False)
 
     def _serialize_job(self, job: VideoJob) -> bytes:
         """Serialize VideoJob to bytes using pickle for Redis storage"""
@@ -72,3 +66,11 @@ class JobService:
             self.redis_client.delete(f"job:{job_id}")
 
         return ret
+
+    async def redis_health_check(self) -> bool:
+        try:
+            self.redis_client.ping()
+            return True
+        except redis.RedisError:
+            return False
+        

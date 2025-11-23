@@ -78,3 +78,11 @@ class Jobs(APIController):
             "video_url": "https://storage.googleapis.com/hackwestern_bucket/videos/15826790601517257638/sample_0.mp4"
         })
     
+    @get("/health/redis")
+    async def redis_health_check(self):
+        is_healthy = await self.job_service.redis_health_check()
+        if is_healthy:
+            return Response(200)
+        else:
+            return Response(500)
+        
