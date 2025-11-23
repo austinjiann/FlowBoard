@@ -147,7 +147,6 @@ export const VideoGenerationManager = () => {
                                     );
 
                                     const responseText = await sceneResp.text();
-                                    console.log(sceneResp.status, responseText);
 
                                     if (sceneResp.ok) {
                                         const latestArrow = editor.getShape(currentArrow.id);
@@ -155,7 +154,6 @@ export const VideoGenerationManager = () => {
                                         try {
                                             const extracted = JSON.parse(responseText);
                                             updateSceneState(extracted);
-                                            console.log("OKOKOKOIKOKOKOKOKOK", extracted);
 
                                             addClip({
                                                 index: context?.clips.length ?? 0,

@@ -498,7 +498,6 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       
         formData.append("custom_prompt", promptText);
         formData.append("global_context", JSON.stringify(context?.sceneState ?? {}));
-        console.log("TEST HUEIHGIUEWHUIGIUH", JSON.stringify(context?.sceneState ?? {}));
         formData.append("files", blob)
 
         try {

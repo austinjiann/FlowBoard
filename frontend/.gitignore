@@ -3,3 +3,4 @@ node_modules
 .yarn/
 .env
 dist/
+*.DS_Store

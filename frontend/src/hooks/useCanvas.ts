@@ -8,20 +8,37 @@ import {
   AssetRecordType,
   Box,
 } from "tldraw";
+import { seedDefaultCanvas } from "../utils/canvasDefaults";
 
 export const useCanvas = () => {
   const editorRef = useRef<Editor | null>(null);
-  const frameIdsRef = useRef<TLShapeId[]>([]);
+  const frameIdsRef = useRef<Map<string, TLShapeId[]>>(new Map());
 
   const FRAME_WIDTH = 1920;
   const FRAME_HEIGHT = 1080;
 
+  const getPageFrameIds = useCallback((editor: Editor) => {
+    const pageId = editor.getCurrentPageId();
+    if (!pageId) {
+      return { pageId: null as string | null, ids: [] as TLShapeId[] };
+    }
+
+    let ids = frameIdsRef.current.get(pageId);
+    if (!ids) {
+      ids = [];
+      frameIdsRef.current.set(pageId, ids);
+    }
+
+    return { pageId, ids };
+  }, []);
+
   const createFrame = useCallback((editor: Editor, position?: { x: number; y: number }) => {
     const shapeId = createShapeId();
+    const { ids } = getPageFrameIds(editor);
 
     const lastFrame =
-      frameIdsRef.current.length > 0
-        ? editor.getShape(frameIdsRef.current[frameIdsRef.current.length - 1])
+      ids.length > 0
+        ? editor.getShape(ids[ids.length - 1])
         : null;
 
     // Calculate position based on the last frame's actual width if it exists
@@ -44,10 +61,10 @@ export const useCanvas = () => {
     };
 
     editor.createShapes([shape]);
-    frameIdsRef.current.push(shapeId);
+    ids.push(shapeId);
 
     return shapeId;
-  }, []);
+  }, [getPageFrameIds]);
 
   const handleImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!editorRef.current) return;
@@ -81,9 +98,10 @@ export const useCanvas = () => {
 
         editor.createAssets([asset]);
 
+        const { ids } = getPageFrameIds(editor);
         const firstFrame =
-          frameIdsRef.current.length > 0
-            ? editor.getShape(frameIdsRef.current[0])
+          ids.length > 0
+            ? editor.getShape(ids[0])
             : null;
 
         const x = firstFrame ? firstFrame.x + 50 : 150;
@@ -108,25 +126,74 @@ export const useCanvas = () => {
     };
     reader.readAsDataURL(file);
     e.target.value = "";
-  }, []);
+  }, [getPageFrameIds]);
+
+  const focusCameraOnFrame = useCallback(
+    (editor: Editor, frameId: TLShapeId, opts?: { immediate?: boolean }) => {
+      const frame = editor.getShape(frameId);
+      if (!frame) return;
+      
+      const frameBounds = editor.getShapePageBounds(frameId);
+      if (!frameBounds) return;
+
+      // Get all seeded tutorial shapes (those with the seed meta tag)
+      const tutorialShapes = editor.getCurrentPageShapes().filter(
+        (s) => s.meta?.seedTag === "flowboard-default-seed-v1"
+      );
+
+      // Calculate bounds that include both frame and tutorial content
+      let combinedBounds = frameBounds.clone();
+      tutorialShapes.forEach((shape) => {
+        const shapeBounds = editor.getShapePageBounds(shape.id);
+        if (shapeBounds) {
+          combinedBounds = combinedBounds.expand(shapeBounds);
+        }
+      });
+
+      const size = Math.max(combinedBounds.width, combinedBounds.height);
+      const padding = size > 0 ? size * 0.02 : 32; // Reduced padding for closer zoom
+      const paddedBounds = combinedBounds.clone().expandBy(padding);
+      const moveOptions = opts?.immediate
+        ? { immediate: true }
+        : { animation: { duration: 360 } };
+
+      editor.zoomToBounds(paddedBounds, moveOptions);
+    },
+    []
+  );
+
+  const ensureTutorialLayout = useCallback((editor: Editor, focusOpts?: { immediate?: boolean }) => {
+    const { ids } = getPageFrameIds(editor);
+    let targetFrameId = ids.find((id) => editor.getShape(id)) ?? null;
+    if (!targetFrameId) {
+      targetFrameId = createFrame(editor);
+    }
+    if (targetFrameId) {
+      seedDefaultCanvas(editor, targetFrameId);
+      focusCameraOnFrame(editor, targetFrameId, focusOpts);
+    }
+  }, [createFrame, focusCameraOnFrame, getPageFrameIds]);
 
   const handleClear = useCallback(() => {
     if (!editorRef.current) return;
 
-    const firstFrameId = frameIdsRef.current[0];
-    const shapes = editorRef.current.getCurrentPageShapesSorted();
+    const editor = editorRef.current;
+    const { pageId, ids } = getPageFrameIds(editor);
+    const firstFrameId = ids[0];
+    const shapes = editor.getCurrentPageShapesSorted();
 
     const shapesToDelete = shapes
       .filter((s) => s.id !== firstFrameId)
       .map((s) => s.id);
-
-    editorRef.current.deleteShapes(shapesToDelete);
+    editor.deleteShapes(shapesToDelete);
     
-    // Reset frames list to just the first one if it exists, or empty
-    // Actually, the original code kept the first frame.
-    frameIdsRef.current = firstFrameId ? [firstFrameId] : [];
-  }, []);
+    if (pageId) {
+      frameIdsRef.current.set(pageId, firstFrameId ? [firstFrameId] : []);
+    }
 
+    ensureTutorialLayout(editor);
+  }, [ensureTutorialLayout, getPageFrameIds]);
+  
   const handleMount = useCallback((editor: Editor) => {
     editorRef.current = editor;
     editor.updateInstanceState({ isGridMode: true });
@@ -135,10 +202,12 @@ export const useCanvas = () => {
     const existingFrames = editor.getCurrentPageShapes().filter(s => s.type === 'aspect-frame');
     
     if (existingFrames.length === 0) {
-        createFrame(editor);
+      createFrame(editor);
     } else {
-        // Sync ref with existing frames
-        frameIdsRef.current = existingFrames.map(s => s.id);
+      const pageId = editor.getCurrentPageId();
+      if (pageId) {
+        frameIdsRef.current.set(pageId, existingFrames.map(s => s.id));
+      }
         
         // Migration: Update existing frames to include new properties if missing
         const framesToUpdate = existingFrames.filter(frame => {
@@ -271,6 +340,9 @@ export const useCanvas = () => {
 
     // Register listener to select frame when clicking on its children
     editor.sideEffects.registerAfterChangeHandler('instance_page_state', (prev, next) => {
+      if (prev.pageId !== next.pageId) {
+        setTimeout(() => ensureTutorialLayout(editor, { immediate: true }), 0);
+      }
       const nextSelected = next.selectedShapeIds;
       const prevSelected = prev.selectedShapeIds;
       
@@ -304,7 +376,8 @@ export const useCanvas = () => {
     // To be safe, we can store the cleanup function in a ref and call it if it exists.
     // But for now, let's just register it.
     
-  }, [createFrame]);
+    ensureTutorialLayout(editor, { immediate: true });
+  }, [createFrame, ensureTutorialLayout]);
 
   return {
     handleMount,
