@@ -53,7 +53,7 @@ class VertexService:
     
     async def get_video_status(self, operation: GenerateVideosOperation) -> JobStatus:
         operation = self.client.operations.get(operation)
-        if operation.done:
+        if operation.done and operation.result and operation.result.generated_videos:
             return JobStatus(status="done", job_start_time=None, video_url=operation.result.generated_videos[0].video.uri)
         return JobStatus(status="waiting", job_start_time=None, video_url=None)
     
