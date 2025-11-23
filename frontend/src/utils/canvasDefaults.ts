@@ -10,7 +10,7 @@ import {
 
 const SEED_META_TAG = "flowboard-default-seed-v1";
 
-const GITHUB_URL = "https://github.com/austinjiann/Hack-Western";
+const GITHUB_URL = "https://github.com/austinjiann/FlowBoard";
 const DEVPOST_URL = "https://devpost.com/software/flowboard-bdpqzg";
 
 // Array of default images to insert
