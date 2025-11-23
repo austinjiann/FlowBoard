@@ -129,6 +129,7 @@ export const useCanvas = () => {
 
   const handleMount = useCallback((editor: Editor) => {
     editorRef.current = editor;
+    editor.updateInstanceState({ isGridMode: true });
     
     // Check if any frames already exist in the editor to prevent duplicates in Strict Mode
     const existingFrames = editor.getCurrentPageShapes().filter(s => s.type === 'aspect-frame');
@@ -222,26 +223,6 @@ export const useCanvas = () => {
                 editor.deleteShapes(arrowsToDelete);
             }
         }
-    });
-
-    // Register side effect to auto-select incoming arrow when frame is selected
-    editor.sideEffects.registerBeforeChangeHandler('instance_page_state', (_prev, next) => {
-      const nextSelected = next.selectedShapeIds;
-      if (nextSelected.length === 1) {
-        const selectedId = nextSelected[0];
-        const shape = editor.getShape(selectedId);
-        if (shape && shape.type === 'aspect-frame') {
-           const bindings = editor.getBindingsInvolvingShape(selectedId);
-           const incomingBinding = bindings.find((b: any) => b.toId === selectedId && b.props.terminal === 'end');
-           if (incomingBinding) {
-             return {
-               ...next,
-               selectedShapeIds: [...nextSelected, incomingBinding.fromId]
-             };
-           }
-        }
-      }
-      return next;
     });
 
     // Register listener to select frame when clicking on its children
