@@ -3,6 +3,7 @@ import { Theme } from "@radix-ui/themes";
 import { Toaster } from "sonner";
 import Landing from "./pages/Landing";
 import Canvas from "./pages/Canvas";
+import Pricing from "./pages/Pricing";
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/app" element={<Canvas />} />
         </Routes>
       </BrowserRouter>
