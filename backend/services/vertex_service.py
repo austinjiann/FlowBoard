@@ -13,11 +13,6 @@ class VertexService:
         self.bucket_name = settings.GOOGLE_CLOUD_BUCKET_NAME
 
     async def generate_video_content(self, prompt: str, image_data: bytes = None, ending_image_data: bytes = None, duration_seconds: int = 6) -> GenerateVideosOperation:
-        
-        annotation_image = VideoGenerationReferenceImage(
-            image=image_data,
-            reference_type="asset"
-        )
 
         starting_frame = await self.generate_image_content(
             prompt="Remove all text, captions, subtitles, annotations from this image. Generate a clean version of the image with no text. Keep the art/image style the exact same.",
@@ -48,7 +43,6 @@ class VertexService:
                 duration_seconds=duration_seconds,
                 output_gcs_uri=f"gs://{self.bucket_name}/videos/",
                 negative_prompt="text, captions, subtitles, annotations, low quality, static, ugly, weird physics",
-                reference_images=[annotation_image],
                 last_frame=ending_frame,
             ),
         )
@@ -92,6 +86,19 @@ class VertexService:
                 prompt
                 ]
         )
+    
+    async def analyze_image_content(self, prompt: str, image_data: bytes) -> dict:
+        return self.client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=[
+                Part.from_bytes(
+                    data=image_data,
+                    mime_type="image/png",
+                ),
+                prompt
+                ]
+        )
+    
 
     async def test_service(self):
         return self.client.models.generate_content(

@@ -19,6 +19,7 @@ import {
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { useGlobalContext } from "../../hooks/useGlobalContext";
+import { apiFetch } from "../../utils/api";
 
 export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
   const editor = useEditor();
@@ -212,9 +213,10 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       formData.append("image", blob, "frame.png");
 
       // Call the improve image API (nanobanana)
-      const response = await fetch(`${backend_url}/api/gemini/image`, {
+      const response = await apiFetch(`${backend_url}/api/gemini/image`, {
         method: "POST",
         body: formData,
+        
       });
 
       if (!response.ok) {
@@ -548,7 +550,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     formData.append("files", blob);
 
     try {
-      const response = await fetch(`${backend_url}/api/jobs/video`, {
+      const response = await apiFetch(`${backend_url}/api/jobs/video`, {
         method: "POST",
         body: formData,
       });

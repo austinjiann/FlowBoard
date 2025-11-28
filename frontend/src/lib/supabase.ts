@@ -1,12 +1,8 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // Support both VITE_ and NEXT_PUBLIC_ prefixes for compatibility
-const supabaseUrl =
-  import.meta.env.VITE_SUPABASE_URL
-  "";
-const supabaseAnonKey =
-  import.meta.env.VITE_SUPABASE_PUBLIC_KEY
-  "";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLIC_KEY || "";
 
 let supabase: SupabaseClient;
 

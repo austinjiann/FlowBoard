@@ -7,6 +7,7 @@ import {
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useGlobalContext } from "../../hooks/useGlobalContext";
+import { apiFetch } from "../../utils/api";
 
 export const VideoGenerationManager = () => {
   const editor = useEditor();
@@ -41,7 +42,7 @@ export const VideoGenerationManager = () => {
 
         const pollInterval = window.setInterval(async () => {
           try {
-            const response = await fetch(
+            const response = await apiFetch(
               `${backend_url}/api/jobs/video/${jobId}`,
             );
 
@@ -143,7 +144,7 @@ export const VideoGenerationManager = () => {
                   const fd = new FormData();
                   fd.append("files", blob, "video.mp4");
 
-                  const sceneResp = await fetch(
+                  const sceneResp = await apiFetch(
                     `${backend_url}/api/gemini/extract-context`,
                     {
                       method: "POST",

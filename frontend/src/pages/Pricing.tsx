@@ -13,6 +13,7 @@ import { Check, Sparkles, Video, Loader2 } from "lucide-react";
 import { useState } from "react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
+import { apiFetch } from "../utils/api";
 
 export default function Pricing() {
   const backendUrl =
@@ -24,7 +25,7 @@ export default function Pricing() {
     setLoadingProductId(productId);
 
     try {
-      const response = await fetch(`${backendUrl}/api/autumn/checkout`, {
+      const response = await apiFetch(`${backendUrl}/api/autumn/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ product_id: productId }),

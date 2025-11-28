@@ -14,7 +14,7 @@ class JobService:
         self.vertex_service = vertex_service
         self.redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=False)
 
-    def _serialize_job(self, job: VideoJob) -> bytes:
+    def _serialize_job(self, job: VideoJob) -> str | bytes:
         """Serialize VideoJob to bytes using pickle for Redis storage"""
         return blosc.compress(pickle.dumps(job))
     
@@ -25,8 +25,14 @@ class JobService:
         return pickle.loads(blosc.decompress(data))
 
     async def create_video_job(self, request: VideoJobRequest) -> str:
+
+        annotation_description = await self.vertex_service.analyze_image_content(
+            prompt="Describe any animation annotations you see. Use this description to inform video generation. Be descriptive about where the annotations are.",
+            image_data=request.starting_image
+        )
+
         operation = await self.vertex_service.generate_video_content(
-            create_video_prompt(request.custom_prompt, request.global_context),
+            create_video_prompt(request.custom_prompt, request.global_context, annotation_description),
             request.starting_image,
             request.ending_image,
             request.duration_seconds

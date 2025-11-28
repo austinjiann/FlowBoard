@@ -49,7 +49,7 @@ class SupabaseService:
         """
         try:
             self.supabase.rpc(
-                "add_user_credits",
+                "sub_user_credits",
                 {
                     "p_user_id": user_id,
                     "p_credit_change": credit_usage
