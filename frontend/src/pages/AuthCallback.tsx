@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { toast } from 'sonner';
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import { toast } from "sonner";
 
 // Global flag to prevent duplicate notifications across component re-renders
 let hasShownAuthNotification = false;
@@ -15,62 +15,64 @@ export default function AuthCallback() {
       // Prevent duplicate processing
       if (hasProcessed.current) return;
       hasProcessed.current = true;
-      
+
       try {
         // Check for error in URL hash
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const errorParam = hashParams.get('error');
-        const errorDescription = hashParams.get('error_description');
-        
+        const hashParams = new URLSearchParams(
+          window.location.hash.substring(1),
+        );
+        const errorParam = hashParams.get("error");
+        const errorDescription = hashParams.get("error_description");
+
         if (errorParam) {
           if (!hasShownAuthNotification) {
             hasShownAuthNotification = true;
-            toast.error(errorDescription || 'Authentication failed');
+            toast.error(errorDescription || "Authentication failed");
           }
-          navigate('/login');
+          navigate("/login");
           return;
         }
 
         // Supabase automatically handles the OAuth callback from the URL hash
         // Wait a moment for Supabase to process the callback
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         const { data, error } = await supabase.auth.getSession();
-        
+
         if (error) {
-          console.error('Auth error:', error);
+          console.error("Auth error:", error);
           if (!hasShownAuthNotification) {
             hasShownAuthNotification = true;
-            toast.error('Authentication failed: ' + error.message);
+            toast.error("Authentication failed: " + error.message);
           }
-          navigate('/login');
+          navigate("/login");
           return;
         }
 
         if (data.session) {
           if (!hasShownAuthNotification) {
             hasShownAuthNotification = true;
-            toast.success('Successfully signed in!');
+            toast.success("Successfully signed in!");
             // Reset flag after a delay to allow for future sign-ins
             setTimeout(() => {
               hasShownAuthNotification = false;
             }, 2000);
           }
-          navigate('/dashboard');
+          navigate("/dashboard");
         } else {
           // No session found, redirect to login
-          navigate('/login');
+          navigate("/login");
         }
       } catch (error) {
-        console.error('Error handling auth callback:', error);
+        console.error("Error handling auth callback:", error);
         if (!hasShownAuthNotification) {
           hasShownAuthNotification = true;
-          toast.error('An error occurred during authentication');
+          toast.error("An error occurred during authentication");
           setTimeout(() => {
             hasShownAuthNotification = false;
           }, 2000);
         }
-        navigate('/login');
+        navigate("/login");
       }
     };
 
@@ -86,4 +88,3 @@ export default function AuthCallback() {
     </div>
   );
 }
-

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Menu, X, LogIn, LogOut, LayoutDashboard, User as UserIcon } from "lucide-react";
+import {
+  Menu,
+  X,
+  LogIn,
+  LogOut,
+  LayoutDashboard,
+  User as UserIcon,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 import { NavItem } from "../../types/types";
@@ -12,19 +19,21 @@ const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  
+
   // Get user's display name
   const getUserName = () => {
-    if (!user) return '';
-    return user.user_metadata?.full_name || 
-           user.user_metadata?.name || 
-           user.email?.split('@')[0] || 
-           'User';
+    if (!user) return "";
+    return (
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.email?.split("@")[0] ||
+      "User"
+    );
   };
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/');
+    navigate("/");
   };
 
   useEffect(() => {
@@ -88,15 +97,21 @@ const Navbar: React.FC = () => {
               ${isScrolled ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"}
             `}
             >
-              <LayoutDashboard className={`${isScrolled ? "w-3 h-3" : "w-4 h-4"}`} />
+              <LayoutDashboard
+                className={`${isScrolled ? "w-3 h-3" : "w-4 h-4"}`}
+              />
               <span className="relative z-10">Dashboard</span>
             </button>
             {user ? (
               <>
                 {/* Profile Button */}
                 <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md text-gray-700 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-black/5 border border-gray-200/50 px-3 py-1.5">
-                  <UserIcon className={`${isScrolled ? "w-3 h-3" : "w-4 h-4"}`} />
-                  <span className={`${isScrolled ? "text-xs" : "text-sm"}`}>{getUserName()}</span>
+                  <UserIcon
+                    className={`${isScrolled ? "w-3 h-3" : "w-4 h-4"}`}
+                  />
+                  <span className={`${isScrolled ? "text-xs" : "text-sm"}`}>
+                    {getUserName()}
+                  </span>
                 </div>
                 {/* Logout Button */}
                 <button

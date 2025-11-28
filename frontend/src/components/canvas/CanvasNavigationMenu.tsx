@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Menu, X, Home, LayoutDashboard, LogIn } from "lucide-react";
+import { Menu, Home, LayoutDashboard, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 
@@ -71,4 +71,3 @@ export const CanvasNavigationMenu: React.FC = () => {
     </Dialog.Root>
   );
 };
-

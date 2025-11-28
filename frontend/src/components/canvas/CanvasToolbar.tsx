@@ -3,10 +3,7 @@ import { Button, Flex, Tooltip } from "@radix-ui/themes";
 import { Eraser, Video } from "lucide-react";
 import { Editor } from "tldraw";
 import { toast } from "sonner";
-import {
-  mergeVideosClient,
-  downloadVideo,
-} from "../../utils/videoMergeUtils";
+import { mergeVideosClient, downloadVideo } from "../../utils/videoMergeUtils";
 import { VideoClip } from "../../types/types";
 
 interface CanvasToolbarProps {

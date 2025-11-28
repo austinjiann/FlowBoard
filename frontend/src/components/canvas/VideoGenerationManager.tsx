@@ -17,7 +17,7 @@ export const VideoGenerationManager = () => {
 
   useEffect(() => {
     // Monitor for new arrows with pending jobs and start polling for them
-    const checkInterval = setInterval(() => {
+    const checkInterval = window.setInterval(() => {
       const arrows = editor
         .getCurrentPageShapes()
         .filter(
@@ -39,7 +39,7 @@ export const VideoGenerationManager = () => {
         // Start a new interval for this specific job
         const backend_url = import.meta.env.VITE_BACKEND_URL || "";
 
-        const pollInterval = setInterval(async () => {
+        const pollInterval = window.setInterval(async () => {
           try {
             const response = await fetch(
               `${backend_url}/api/jobs/video/${jobId}`,
@@ -49,7 +49,7 @@ export const VideoGenerationManager = () => {
             if (response.status === 404) {
               const intervalId = intervalsRef.current.get(jobId);
               if (intervalId) {
-                clearInterval(intervalId);
+                window.clearInterval(intervalId);
                 intervalsRef.current.delete(jobId);
               }
               return;
@@ -62,7 +62,7 @@ export const VideoGenerationManager = () => {
               // Clear this job's interval
               const intervalId = intervalsRef.current.get(jobId);
               if (intervalId) {
-                clearInterval(intervalId);
+                window.clearInterval(intervalId);
                 intervalsRef.current.delete(jobId);
               }
 
@@ -102,7 +102,7 @@ export const VideoGenerationManager = () => {
               // Arrow was deleted, stop polling
               const intervalId = intervalsRef.current.get(jobId);
               if (intervalId) {
-                clearInterval(intervalId);
+                window.clearInterval(intervalId);
                 intervalsRef.current.delete(jobId);
               }
               return;
@@ -115,7 +115,7 @@ export const VideoGenerationManager = () => {
               // Stop polling this job immediately
               const intervalId = intervalsRef.current.get(jobId);
               if (intervalId) {
-                clearInterval(intervalId);
+                window.clearInterval(intervalId);
                 intervalsRef.current.delete(jobId);
               }
 
@@ -354,11 +354,11 @@ export const VideoGenerationManager = () => {
     return () => {
       // Clear the check interval
       if (checkInterval) {
-        clearInterval(checkInterval);
-      }
+          window.clearInterval(checkInterval);
+        }
       // Clear all job-specific intervals
       intervalsRef.current.forEach((intervalId) => {
-        clearInterval(intervalId);
+        window.clearInterval(intervalId);
       });
       intervalsRef.current.clear();
       completedJobsRef.current.clear();
