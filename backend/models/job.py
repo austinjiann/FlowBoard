@@ -12,6 +12,7 @@ class VideoGenerationInput:
 @dataclass
 class VideoJobRequest:
     starting_image: bytes
+    ending_image: Optional[bytes] = None
     global_context: str
     custom_prompt: str
     duration_seconds: int = 6

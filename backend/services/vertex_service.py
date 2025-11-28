@@ -1,5 +1,5 @@
 from google import genai
-from google.genai.types import GenerateVideosConfig, GenerateVideosOperation, Image, GenerateContentConfig, ImageConfig, Part
+from google.genai.types import GenerateVideosConfig, GenerateVideosOperation, Image, GenerateContentConfig, ImageConfig, Part, VideoGenerationReferenceImage
 from models.job import JobStatus
 from utils.env import settings
 
@@ -12,20 +12,44 @@ class VertexService:
         )
         self.bucket_name = settings.GOOGLE_CLOUD_BUCKET_NAME
 
-    async def generate_video_content(self, prompt: str, image_data: bytes = None, duration_seconds: int = 6) -> GenerateVideosOperation:
+    async def generate_video_content(self, prompt: str, image_data: bytes = None, ending_image_data: bytes = None, duration_seconds: int = 6) -> GenerateVideosOperation:
+        
+        annotation_image = VideoGenerationReferenceImage(
+            image=image_data,
+            reference_type="asset"
+        )
+
+        starting_frame = await self.generate_image_content(
+            prompt="Remove all text, captions, subtitles, annotations from this image. Generate a clean version of the image with no text. Keep the art/image style the exact same.",
+            image=image_data
+        )
+
+        ending_frame = None
+        if ending_image_data:
+            ending_frame = await self.generate_image_content(
+                prompt="Remove all text, captions, subtitles, annotations from this image. Generate a clean version of the image with no text. Keep the art/image style the exact same.",
+                image=ending_image_data
+            )
+            ending_frame = Image(
+                image_bytes=ending_frame,
+                mime_type="image/png",
+            )
+
         # gen vid
         operation = self.client.models.generate_videos(
             model="veo-3.1-fast-generate-001",
             prompt=prompt,
             image=Image(
-                image_bytes=image_data,
+                image_bytes=starting_frame,
                 mime_type="image/png",
             ),
             config=GenerateVideosConfig(
                 aspect_ratio="16:9",
                 duration_seconds=duration_seconds,
                 output_gcs_uri=f"gs://{self.bucket_name}/videos/",
-                negative_prompt="text, annotations, low quality",
+                negative_prompt="text, captions, subtitles, annotations, low quality, static, ugly, weird physics",
+                reference_images=[annotation_image],
+                last_frame=ending_frame,
             ),
         )
 

@@ -28,9 +28,11 @@ class Jobs(APIController):
             return json({"error": "No image file provided"}, status=400)
 
         image_file = files[0]
+        ending_image_file = files[1] if len(files) > 1 else None
         
         data = VideoJobRequest(
             starting_image=image_file.data,
+            ending_image=ending_image_file.data if ending_image_file else None,
             global_context=input.value.global_context,
             custom_prompt=input.value.custom_prompt
         )

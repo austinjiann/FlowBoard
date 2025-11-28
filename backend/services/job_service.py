@@ -28,6 +28,7 @@ class JobService:
         operation = await self.vertex_service.generate_video_content(
             create_video_prompt(request.custom_prompt, request.global_context),
             request.starting_image,
+            request.ending_image,
             request.duration_seconds
             )
         
