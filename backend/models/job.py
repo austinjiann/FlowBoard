@@ -12,15 +12,15 @@ class VideoGenerationInput:
 @dataclass
 class VideoJobRequest:
     starting_image: bytes
-    ending_image: Optional[bytes] = None
     global_context: str
     custom_prompt: str
     duration_seconds: int = 6
+    ending_image: Optional[bytes] = None
 
 @dataclass
 class JobStatus:
-    status: Optional[Literal["done", "waiting"]]
     job_start_time: datetime
+    status: Optional[Literal["done", "waiting"]]
     job_end_time: Optional[datetime] = None
     video_url: Optional[str] = None
 
