@@ -21,6 +21,7 @@ export type IFrameShape = TLBaseShape<
     name?: string;
     backgroundColor?: string;
     opacity?: number;
+    isLocked?: boolean;
   }
 >;
 
@@ -32,6 +33,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
     name: T.string.optional(),
     backgroundColor: T.string.optional(),
     opacity: T.number.optional(),
+    isLocked: T.boolean.optional(),
   };
 
   override getDefaultProps(): IFrameShape["props"] {
@@ -41,6 +43,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
       name: "16:9 Frame",
       backgroundColor: "#ffffff",
       opacity: 1,
+      isLocked: false,
     };
   }
 
@@ -180,8 +183,15 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
     this.editor.reparentShapes(shapesToReparent, shape.id);
   }
 
-  override canResizeChildren(_shape: IFrameShape) {
-    void _shape;
+  override canResizeChildren(shape: IFrameShape) {
+    return !shape.props.isLocked;
+  }
+
+  override canEditChildren(shape: IFrameShape) {
+    return !shape.props.isLocked;
+  }
+
+  override canBindShapes(_shape: IFrameShape) {
     return true;
   }
 }

@@ -609,6 +609,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
         id: shapeId,
         type: "aspect-frame",
         props: {
+          ...frame.props,
           isLocked: !isLocked,
         },
       },

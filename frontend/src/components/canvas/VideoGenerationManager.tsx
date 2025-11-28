@@ -271,18 +271,19 @@ export const VideoGenerationManager = () => {
                             const scaledW = video.videoWidth * scale;
                             const scaledH = video.videoHeight * scale;
 
-                            const imageX =
-                              targetFrame.x + (frameW - scaledW) / 2;
-                            const imageY =
-                              targetFrame.y + (frameH - scaledH) / 2;
+                            // Use relative coordinates (relative to parent frame)
+                            const imageX = (frameW - scaledW) / 2;
+                            const imageY = (frameH - scaledH) / 2;
 
                             const imageShapeId = createShapeId();
                             editor.createShapes([
                               {
                                 id: imageShapeId,
                                 type: "image",
+                                parentId: targetFrameId,
                                 x: imageX,
                                 y: imageY,
+                                isLocked: true,
                                 props: {
                                   assetId,
                                   w: scaledW,

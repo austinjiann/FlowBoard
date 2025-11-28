@@ -61,6 +61,7 @@ export type IFrameShape = TLBaseShape<
     name?: string;
     backgroundColor?: string;
     opacity?: number;
+    isLocked?: boolean;
   }
 >;
 
@@ -72,7 +73,12 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
     name: T.string.optional(),
     backgroundColor: T.string.optional(),
     opacity: T.number.optional(),
+    isLocked: T.boolean.optional(),
   };
+
+  override isAspectRatioLocked(_shape: IFrameShape) {
+    return true;
+  }
 
   override getDefaultProps(): IFrameShape["props"] {
     return {
@@ -81,6 +87,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
       name: "16:9 Frame",
       backgroundColor: "#ffffff",
       opacity: 1,
+      isLocked: false,
     };
   }
 
@@ -105,7 +112,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
           width: "100%",
           height: "100%",
           boxSizing: "border-box",
-          pointerEvents: "all",
+          pointerEvents: "none",
           position: "relative",
           opacity: 1,
         }}
@@ -122,7 +129,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
             width: "100%",
             height: "100%",
             zIndex: 0,
-            pointerEvents: "all",
+            pointerEvents: shape.props.isLocked ? "all" : "none",
             cursor: "pointer",
           }}
           onClick={(e) => {
@@ -130,8 +137,10 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
               this.editor.select(shape.id);
             }
           }}
-          onPointerDown={(_e) => {
-            this.editor.select(shape.id);
+          onPointerDown={(e) => {
+            if (e.target === e.currentTarget) {
+              this.editor.select(shape.id);
+            }
           }}
         />
 
@@ -145,7 +154,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
             backgroundColor: shape.props.backgroundColor || "#ffffff",
             opacity: opacity,
             pointerEvents: "none",
-            zIndex: 1,
+            zIndex: -1,
           }}
         />
 
@@ -160,13 +169,13 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
             fontWeight: 600,
             fontFamily: "Inter, sans-serif",
             zIndex: 10,
-            pointerEvents: "none",
+            pointerEvents: "auto",
           }}
         >
           {shape.props.name || "16:9 Frame"}
         </div>
 
-        <div style={{ position: "relative", zIndex: 10, opacity: 1 }}>
+        <div style={{ position: "relative", zIndex: 10, opacity: 1, pointerEvents: "auto" }}>
           <FrameActionMenu shapeId={shape.id} />
         </div>
       </HTMLContainer>
@@ -194,7 +203,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
     this.editor.reparentShapes(shapesToReparent, shape.id);
   }
 
-  override canResizeChildren(_shape: IFrameShape) {
-    return true;
+  override canResizeChildren(shape: IFrameShape) {
+    return !shape.props.isLocked;
   }
 }
