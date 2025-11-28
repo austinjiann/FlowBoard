@@ -15,6 +15,8 @@ import {
   Type,
   Banana,
   Loader2,
+  Lock,
+  Unlock,
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
@@ -513,6 +515,16 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     setNameValue("");
   };
 
+    // Count arrows that start from this frame (for tree branching)
+    const getExistingBranchCount = (frameId: TLShapeId): number => {
+        const bindings = editor.getBindingsToShape(frameId, 'arrow');
+        // Filter for bindings where this frame is the "start" terminal
+        return bindings.filter(b => {
+            const props = b.props as { terminal?: string };
+            return props.terminal === 'start';
+        }).length;
+    };
+
   const handleGenerate = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -567,11 +579,13 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       const jobId = jsonObj.job_id;
       const pageId = editor.getCurrentPageId();
 
-      // Create a new frame to the right
+      // Create a new frame to the right (with vertical offset for branching)
       const newFrameId = createShapeId();
       const gap = 2000;
+            const branchCount = getExistingBranchCount(shapeId);
+            const verticalGap = frameH + 200; // Space between stacked frames
       const newFrameX = currentFrame.x + frameW + gap;
-      const newFrameY = currentFrame.y;
+      const newFrameY = currentFrame.y + (branchCount * verticalGap);
 
       editor.createShapes([
         {
@@ -682,10 +696,26 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       : "#ffffff";
   const frameHeight = "h" in frame.props ? (frame.props.h as number) : 540;
   const frameWidth = "w" in frame.props ? (frame.props.w as number) : 960;
+  const isLocked =
+    "isLocked" in frame.props ? (frame.props.isLocked as boolean) : false;
 
   // Scale text box size based on frame width
   const textBoxWidth = frameWidth;
   const fontSize = Math.max(14, Math.min(frameWidth * 0.025, 24));
+
+  // Toggle lock state for frame content
+  const handleToggleLock = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    editor.updateShapes([
+      {
+        id: shapeId,
+        type: "aspect-frame",
+        props: {
+          isLocked: !isLocked,
+        },
+      },
+    ]);
+  };
 
   return (
     <>
@@ -844,6 +874,22 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                 ) : (
                   <Banana size={40} />
                 )}
+              </Button>
+            </Tooltip>
+
+            {/* Lock/Unlock Frame Content */}
+            <Tooltip content={isLocked ? "Unlock Content" : "Lock Content"}>
+              <Button
+                variant="soft"
+                size="3"
+                onClick={handleToggleLock}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "48px",
+                  minHeight: "48px",
+                }}
+              >
+                {isLocked ? <Lock size={40} /> : <Unlock size={40} />}
               </Button>
             </Tooltip>
           </Flex>
