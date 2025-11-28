@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import {
   mergeVideosClient,
   downloadVideo,
-  type VideoClip,
 } from "../../utils/videoMergeUtils";
+import { VideoClip } from "../../types/types";
 
 interface CanvasToolbarProps {
   onClear: () => void;
