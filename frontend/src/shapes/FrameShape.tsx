@@ -85,9 +85,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
               this.editor.select(shape.id);
             }
           }}
-          onPointerDown={(_e) => {
-            // Don't stop propagation - let clicks through to children
-            // But capture the click for selection purposes
+          onPointerDown={() => {
             this.editor.select(shape.id);
           }}
         />
@@ -183,6 +181,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
   }
 
   override canResizeChildren(_shape: IFrameShape) {
+    void _shape;
     return true;
   }
 }

@@ -5,7 +5,6 @@ import { defineConfig } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 
 export default defineConfig([
-  // global ignores
   {
     ignores: ["dist/**", "node_modules/**"],
   },
@@ -18,6 +17,11 @@ export default defineConfig([
         ...globals.node,
       },
     },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
   },
+
+  // Prettier should be last to override formatting rules
   eslintConfigPrettier,
 ]);

@@ -27,7 +27,7 @@ function Login() {
         navigate("/dashboard");
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error("An unexpected error occurred", error);
     } finally {
       setLoading(false);
     }
@@ -43,7 +43,7 @@ function Login() {
       }
       // If successful, user will be redirected to Google OAuth page
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error("An unexpected error occurred", error);
       setLoading(false);
     }
   };
@@ -58,7 +58,7 @@ function Login() {
       }
       // If successful, user will be redirected to GitHub OAuth page
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error("An unexpected error occurred", error);
       setLoading(false);
     }
   };
@@ -67,7 +67,7 @@ function Login() {
     <Theme>
       <div className="min-h-screen relative bg-white">
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
 
         {/* Gradient Blur Effect */}
         <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand-indigo/10 rounded-full blur-[200px] -z-10 pointer-events-none" />
