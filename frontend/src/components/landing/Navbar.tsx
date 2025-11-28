@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, LogOut, LayoutDashboard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 import { NavItem } from "../../types/types";
@@ -63,8 +63,29 @@ const Navbar: React.FC = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* Desktop Action Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className={`
+              flex items-center gap-2 relative overflow-hidden group bg-white/60 backdrop-blur-md text-gray-700 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-black/5 border border-gray-200/50 cursor-pointer hover:bg-white/80
+              ${isScrolled ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"}
+            `}
+            >
+              <LayoutDashboard className={`${isScrolled ? "w-3 h-3" : "w-4 h-4"}`} />
+              <span className="relative z-10">Dashboard</span>
+            </button>
+            <button
+              onClick={() => navigate("/login")}
+              className={`
+              flex items-center gap-2 relative overflow-hidden group bg-black/80 backdrop-blur-md text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-black/10 border border-white/10 cursor-pointer
+              ${isScrolled ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"}
+            `}
+            >
+              <LogIn className={`${isScrolled ? "w-3 h-3" : "w-4 h-4"}`} />
+              <span className="relative z-10">Login</span>
+              <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </button>
             <button
               onClick={() => navigate("/app")}
               className={`
@@ -109,6 +130,28 @@ const Navbar: React.FC = () => {
                         </a>
                       </Dialog.Close>
                     ))}
+                    <Dialog.Close asChild>
+                      <button
+                        onClick={() => {
+                          navigate("/dashboard");
+                        }}
+                        className="w-full py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-lg hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <LayoutDashboard className="w-5 h-5" />
+                        Dashboard
+                      </button>
+                    </Dialog.Close>
+                    <Dialog.Close asChild>
+                      <button
+                        onClick={() => {
+                          navigate("/login");
+                        }}
+                        className="w-full py-3 bg-black text-white font-bold rounded-xl shadow-lg hover:bg-gray-900 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <LogIn className="w-5 h-5" />
+                        Login
+                      </button>
+                    </Dialog.Close>
                     <button
                       onClick={() => {
                         navigate("/app");
