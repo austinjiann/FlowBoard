@@ -186,12 +186,4 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
   override canResizeChildren(shape: IFrameShape) {
     return !shape.props.isLocked;
   }
-
-  override canEditChildren(shape: IFrameShape) {
-    return !shape.props.isLocked;
-  }
-
-  override canBindShapes(_shape: IFrameShape) {
-    return true;
-  }
 }
