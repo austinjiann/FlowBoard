@@ -2,16 +2,18 @@ import { Theme } from "@radix-ui/themes";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import { LogIn } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "sonner";
 
 function Login() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { signInWithGoogle, signInWithGithub } = useAuth();
   const [loading, setLoading] = useState(false);
 
+  const from = (location.state as any)?.from || "/dashboard";
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
@@ -20,7 +22,7 @@ function Login() {
         toast.error(error.message || "Failed to sign in with Google");
         setLoading(false);
       }
-      // If successful, user will be redirected to Google OAuth page
+      navigate(from, { replace: true });
     } catch (error) {
       toast.error("An unexpected error occurred", error);
       setLoading(false);
@@ -35,7 +37,7 @@ function Login() {
         toast.error(error.message || "Failed to sign in with GitHub");
         setLoading(false);
       }
-      // If successful, user will be redirected to GitHub OAuth page
+      navigate(from, { replace: true });
     } catch (error) {
       toast.error("An unexpected error occurred", error);
       setLoading(false);

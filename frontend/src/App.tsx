@@ -5,7 +5,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
-import PricingRoute from "./components/PricingRoute";
 import Landing from "./pages/Landing";
 import Canvas from "./pages/Canvas";
 import Dashboard from "./pages/Dashboard";
@@ -30,14 +29,7 @@ export default function App() {
                   </PublicRoute>
                 }
               />
-              <Route
-                path="/pricing"
-                element={
-                  <PricingRoute>
-                    <Pricing />
-                  </PricingRoute>
-                }
-              />
+              <Route path="/pricing" element={<Pricing />} />
               <Route
                 path="/dashboard"
                 element={

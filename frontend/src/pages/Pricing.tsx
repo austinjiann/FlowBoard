@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -10,17 +11,24 @@ import {
   Separator,
 } from "@radix-ui/themes";
 import { Check, Sparkles, Video, Loader2 } from "lucide-react";
-import { useState } from "react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import { apiFetch } from "../utils/api";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Pricing() {
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleBuyCredits = async (productId: string) => {
+    if (!user) {
+      navigate("/login", { state: { from: "/pricing" } });
+      return;
+    }
     if (loadingProductId) return;
     setLoadingProductId(productId);
 
