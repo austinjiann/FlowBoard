@@ -23,6 +23,7 @@ export default function Pricing() {
     import.meta.env.VITE_BACKEND_URL;
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState<string | null>(null);
   const [creditsAdded, setCreditsAdded] = useState<number | null>(null);
   const [syncing, setSyncing] = useState(false);
   const { user } = useAuth();
@@ -42,7 +43,7 @@ export default function Pricing() {
         setSyncing(true);
         
         try {
-          // Call backend to sync credits
+          // Call backend to sync credits (verifies payment with Autumn)
           const response = await apiFetch(
             `${backendUrl}/api/autumn/sync-credits?product=${encodeURIComponent(productId)}`,
             { method: "GET" }
@@ -51,6 +52,13 @@ export default function Pricing() {
           const result = await response.json();
           console.log("Sync result:", result);
           
+          if (response.status === 402 || result.verified === false) {
+            // Payment not verified - user didn't complete checkout
+            setShowError("Payment not completed. Please complete the checkout to receive credits.");
+            setTimeout(() => setShowError(null), 8000);
+            return;
+          }
+          
           if (result.credits_added) {
             setCreditsAdded(result.credits_added);
           }
@@ -58,13 +66,13 @@ export default function Pricing() {
           setShowSuccess(true);
         } catch (error) {
           console.error("Failed to sync credits:", error);
-          // Still show success (payment went through even if sync failed)
-          setShowSuccess(true);
+          setShowError("Something went wrong. Please try again.");
+          setTimeout(() => setShowError(null), 5000);
         } finally {
           setSyncing(false);
           // Clean up the URL
           setSearchParams({}, { replace: true });
-          // Auto-hide after 5 seconds
+          // Auto-hide success after 5 seconds
           setTimeout(() => {
             setShowSuccess(false);
             setCreditsAdded(null);
@@ -115,7 +123,18 @@ export default function Pricing() {
                 <Loader2 className="animate-spin" size={16} />
               </Callout.Icon>
               <Callout.Text>
-                Processing your purchase...
+                Verifying your purchase...
+              </Callout.Text>
+            </Callout.Root>
+          )}
+
+          {showError && (
+            <Callout.Root color="red" className="mb-8">
+              <Callout.Icon>
+                <span>⚠️</span>
+              </Callout.Icon>
+              <Callout.Text>
+                {showError}
               </Callout.Text>
             </Callout.Root>
           )}

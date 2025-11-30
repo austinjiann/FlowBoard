@@ -121,7 +121,7 @@ class SupabaseService:
         """
         try:
             self.supabase.table("profiles").update({
-                "plan": plan
+                "billing_type": plan  # Column is billing_type, not plan
             }).eq("user_id", user_id).execute()
             return True
         except Exception as e:
@@ -134,10 +134,9 @@ class SupabaseService:
         """
         try:
             self.supabase.table("transaction_log").insert({
-                "transaction_type": "credit_purchase",
+                "transaction_type": "credit_purchase",  # Must be a valid enum value
                 "user_id": user_id,
                 "credit_usage": -credits,  # Negative because user gained credits
-                "metadata": {"product_id": product_id}
             }).execute()
             return True
         except Exception as e:

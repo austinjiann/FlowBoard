@@ -219,6 +219,25 @@ export const useCanvas = () => {
       editorRef.current = editor;
       editor.updateInstanceState({ isGridMode: true });
 
+      // Listen for page creation and reload the browser when a new page is created
+      const knownPageIds = new Set(editor.getPages().map((p) => p.id));
+      editor.store.listen(
+        (entry) => {
+          // Check for new pages being added
+          for (const record of Object.values(entry.changes.added)) {
+            if (record.typeName === "page" && !knownPageIds.has(record.id)) {
+              // New page created - wait for persistence then reload
+              // Small delay to let tldraw persist the new page
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
+              return;
+            }
+          }
+        },
+        { source: "user", scope: "document" }
+      );
+
       // Check if any frames already exist in the editor to prevent duplicates in Strict Mode
       const existingFrames = editor
         .getCurrentPageShapes()

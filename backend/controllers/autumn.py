@@ -114,7 +114,7 @@ class Autumn(APIController):
     async def sync_credits(self, request: Request):
         """
         Sync credits to Supabase after successful payment redirect.
-        Reads product from query param to know how many credits to add.
+        VERIFIES purchase with Autumn API before adding credits.
         """
         try:
             # Get authenticated user ID
@@ -143,6 +143,16 @@ class Autumn(APIController):
             
             if credits == 0:
                 return json({"error": f"Unknown product: {product_id}"}, status=400)
+            
+            # SECURITY: Verify the purchase with Autumn before adding credits
+            product_verified = await self.autumn_service.check_product_purchased(user_id, product_id)
+            print(f"Product verification for {product_id}: {product_verified}")
+            
+            if not product_verified:
+                return json({
+                    "error": "Payment not verified. Please complete checkout.",
+                    "verified": False
+                }, status=402)
             
             # Add credits to Supabase
             self.supabase_service.add_user_credits(user_id, credits)

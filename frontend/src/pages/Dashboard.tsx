@@ -222,8 +222,8 @@ function Dashboard() {
                                   : "text-purple-600"
                               }`}
                             >
-                              {transaction.credit_usage < 0 ? "+" : ""}
-                              {transaction.credit_usage}
+                              {transaction.credit_usage < 0 ? "+" : "-"}
+                              {Math.abs(transaction.credit_usage)}
                             </td>
                           </tr>
                         ))}

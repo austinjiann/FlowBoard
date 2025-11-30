@@ -47,4 +47,53 @@ class AutumnService:
                 "status": response.status_code
             }
 
-    # ... keep your existing methods (checkout, check, track, etc.) ...
+    async def get_customer_entitlements(self, customer_id: str) -> Dict[str, Any]:
+        """
+        Get customer's entitlements/products from Autumn.
+        Used to verify if a payment actually went through.
+        """
+        async with httpx.AsyncClient() as client:
+            url = f"{self.base_url}/entitled"
+            params = {"customer_id": customer_id}
+            
+            response = await client.get(
+                url=url,
+                headers=self.headers,
+                params=params
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            return None
+
+    async def check_product_purchased(self, customer_id: str, product_id: str) -> bool:
+        """
+        Check if customer has purchased a specific product.
+        Returns True if the product was purchased, False otherwise.
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                # Check customer's products/subscriptions
+                url = f"{self.base_url}/customers/{customer_id}"
+                
+                response = await client.get(
+                    url=url,
+                    headers=self.headers
+                )
+                
+                if response.status_code != 200:
+                    print(f"Failed to get customer: {response.status_code}")
+                    return False
+                
+                data = response.json()
+                products = data.get("products", [])
+                
+                # Check if the product_id is in customer's products
+                for product in products:
+                    if product.get("id") == product_id:
+                        return True
+                
+                return False
+        except Exception as e:
+            print(f"Error checking product purchase: {e}")
+            return False
