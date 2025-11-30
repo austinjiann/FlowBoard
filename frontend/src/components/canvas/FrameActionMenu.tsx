@@ -45,16 +45,23 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     shapeId,
   ]);
 
-  // Initialize promptText from frame meta
+  // Initialize promptText from frame meta on mount
+  const initialPromptTextRef = useRef<string | null>(null);
+  
   useEffect(() => {
-    if (frame?.meta?.promptText && typeof frame.meta.promptText === "string") {
+    if (initialPromptTextRef.current === null && frame?.meta?.promptText && typeof frame.meta.promptText === "string") {
+      initialPromptTextRef.current = frame.meta.promptText;
       setPromptText(frame.meta.promptText);
     }
   }, [frame?.id]);
 
-  // Persist promptText to frame meta whenever it changes
+  // Persist promptText to frame meta with debounce to prevent infinite loops
   useEffect(() => {
-    if (frame && promptText !== (frame.meta?.promptText || "")) {
+    if (!frame || promptText === (frame.meta?.promptText || "")) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
       editor.updateShapes([
         {
           id: shapeId,
@@ -65,8 +72,10 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
           },
         },
       ]);
-    }
-  }, [promptText, frame, shapeId, editor]);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [promptText, shapeId]);
 
   // Log path when frame is selected
   useEffect(() => {
