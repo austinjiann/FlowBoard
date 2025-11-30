@@ -39,11 +39,16 @@ class Jobs(APIController):
             custom_prompt=input.value.custom_prompt
         )
 
-        self.supabase_service.do_transaction(
+        success, error = self.supabase_service.do_transaction(
             user_id=user_id,
             transaction_type="video_gen",
             credit_usage=10 # TODO: adjust number later
         )
+        
+        if not success:
+            if error == "insufficient_credits":
+                return json({"error": "You don't have enough credits. Please purchase more credits to continue."}, status=402)
+            return json({"error": "Transaction failed"}, status=500)
         
         job_id = await self.job_service.create_video_job(data)
         return json({"job_id": job_id})
@@ -100,11 +105,17 @@ class Jobs(APIController):
             custom_prompt=input.value.custom_prompt
         )
 
-        self.supabase_service.do_transaction(
+        success, error = self.supabase_service.do_transaction(
             user_id=user_id,
             transaction_type="video_gen",
             credit_usage=10 # TODO: adjust number later
         )
+        
+        if not success:
+            if error == "insufficient_credits":
+                return json({"error": "You don't have enough credits. Please purchase more credits to continue."}, status=402)
+            return json({"error": "Transaction failed"}, status=500)
+        
         # just return random stuff
         return json({"job_id": "mock-job-id"})
 

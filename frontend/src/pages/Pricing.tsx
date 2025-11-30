@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -9,20 +9,35 @@ import {
   Heading,
   Text,
   Separator,
+  Callout,
 } from "@radix-ui/themes";
-import { Check, Sparkles, Video, Loader2 } from "lucide-react";
+import { Check, Sparkles, Video, Loader2, CheckCircle } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import { apiFetch } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Pricing() {
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL;
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    // Check for success query param after payment redirect
+    if (searchParams.get("success") === "true") {
+      setShowSuccess(true);
+      // Clean up the URL
+      setSearchParams({}, { replace: true });
+      // Auto-hide after 5 seconds
+      const timer = setTimeout(() => setShowSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleBuyCredits = async (productId: string) => {
     if (!user) {
@@ -57,6 +72,17 @@ export default function Pricing() {
         <Navbar />
 
         <Container size="4" className="py-20 px-4">
+          {showSuccess && (
+            <Callout.Root color="green" className="mb-8">
+              <Callout.Icon>
+                <CheckCircle size={16} />
+              </Callout.Icon>
+              <Callout.Text>
+                Payment successful! Your credits have been added to your account.
+              </Callout.Text>
+            </Callout.Root>
+          )}
+
           <Flex
             direction="column"
             align="center"
@@ -120,19 +146,9 @@ export default function Pricing() {
                   <FeatureItem text="Public projects" />
                 </Flex>
 
-                <Button
-                  variant="outline"
-                  size="3"
-                  className="w-full cursor-pointer mt-4"
-                  onClick={() => handleBuyCredits("free-trial")}
-                  disabled={loadingProductId !== null}
-                >
-                  {loadingProductId === "free-trial" ? (
-                    <Loader2 className="animate-spin w-4 h-4" />
-                  ) : (
-                    "Start Free"
-                  )}
-                </Button>
+                <div className="w-full py-2 px-4 mt-4 text-center text-sm text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+                  Included by default
+                </div>
               </Flex>
             </Card>
 

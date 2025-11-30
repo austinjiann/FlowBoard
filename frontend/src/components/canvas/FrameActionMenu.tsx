@@ -341,7 +341,21 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to improve image");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        if (response.status === 402) {
+          toast.error("Not enough credits! Please purchase more credits to polish images.");
+          setIsImproving(false);
+          editor.updateShapes([
+            {
+              id: shapeId,
+              type: "aspect-frame",
+              meta: { ...editor.getShape(shapeId)?.meta, isImproving: false },
+            },
+          ]);
+          editor.updateInstanceState({ isReadonly: false });
+          return;
+        }
+        throw new Error(errorData.error || "Failed to improve image");
       }
 
       const result = await response.json();
@@ -507,7 +521,13 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate video");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        if (response.status === 402) {
+          toast.error("Not enough credits! Please purchase more credits to generate videos.", {
+          });
+          return;
+        }
+        throw new Error(errorData.error || "Failed to generate video");
       }
 
       const jsonObj = await response.json();
@@ -631,7 +651,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       }
     } catch (error) {
       console.error("Failed to generate video:", error);
-      toast.error("Failed to generate video");
+      toast.error(error instanceof Error ? error.message : "Failed to generate video");
     }
   };
 

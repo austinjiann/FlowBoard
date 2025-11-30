@@ -81,17 +81,23 @@ class Gemini(APIController):
             
             image_data = files[0]
 
+            # Check and deduct credits BEFORE generating
+            success, error = self.supabase_service.do_transaction(
+                user_id=user_id,
+                transaction_type="image_gen",
+                credit_usage=1 # TODO: adjust number later
+            )
+            
+            if not success:
+                if error == "insufficient_credits":
+                    return json({"error": "You don't have enough credits. Please purchase more credits to continue."}, status=402)
+                return json({"error": "Transaction failed"}, status=500)
+
             prompt = "Improve the attached image. Do not deviate from the original art style too much, simply understand the artist's idea and enhance it a bit."
 
             res = await self.vertex_service.generate_image_content(
                 prompt=prompt,
                 image=image_data.data
-            )
-            
-            self.supabase_service.do_transaction(
-                user_id=user_id,
-                transaction_type="image_gen",
-                credit_usage=1 # TODO: adjust number later
             )
 
             return json({"image_bytes": res})
