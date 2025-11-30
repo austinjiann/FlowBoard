@@ -25,7 +25,6 @@ steps:
       - '--image=gcr.io/gen-lang-client-0521299386/backend-image:latest'
       - '--region=us-central1'
       - '--platform=managed'
-      - '--allow-unauthenticated'
       - '--min-instances=0'
       - '--max-instances=10'
       - '--memory=512Mi'

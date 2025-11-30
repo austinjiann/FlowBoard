@@ -1,11 +1,10 @@
-from blacksheep import Application, Request, json, Request
+from blacksheep import Application, Request, Request
 from services.storage_service import StorageService
 from services.vertex_service import VertexService
 from services.job_service import JobService
 from services.supabase_service import SupabaseService
 from services.autumn_service import AutumnService
 from services.video_merge_service import VideoMergeService
-from controllers.jobs import Jobs
 from rodi import Container
 
 services = Container()
@@ -43,10 +42,6 @@ async def attach_user(request: Request):
         pass
 
 app.middlewares.append(attach_user)
-
-# Register controllers
-# register_controllers takes a list of controller types - blacksheep will resolve dependencies
-app.register_controllers([Jobs])
 
 # random test routes
 @app.router.get("/")
