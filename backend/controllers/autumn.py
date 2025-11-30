@@ -90,8 +90,8 @@ class Autumn(APIController):
             if not customer_id:
                 return json({"error": "Unauthorized"}, status=401)
             
-            # Build success URL to redirect after payment
-            success_url = f"{settings.FRONTEND_URL}/pricing?success=true"
+            # Build success URL to redirect after payment (include product_id)
+            success_url = f"{settings.FRONTEND_URL}/pricing?success=true&product={product_id}"
             
             result = await self.autumn_service.proxy_request(
                 path="checkout",
@@ -105,6 +105,66 @@ class Autumn(APIController):
             )
             print(f"Autumn response: {result}")
             return json(result["data"], status=result["status"])
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return json({"error": str(e)}, status=500)
+
+    @get("/sync-credits")
+    async def sync_credits(self, request: Request):
+        """
+        Sync credits to Supabase after successful payment redirect.
+        Reads product from query param to know how many credits to add.
+        """
+        try:
+            # Get authenticated user ID
+            user_id = request.scope.get("user_id")
+            if not user_id:
+                return json({"error": "Unauthorized"}, status=401)
+            
+            # Get product_id from query params
+            product_id = request.query.get("product")
+            if not product_id:
+                return json({"error": "Missing product parameter"}, status=400)
+            
+            # Blacksheep returns query params as list - get first element
+            if isinstance(product_id, list):
+                product_id = product_id[0]
+            
+            # Handle bytes if needed
+            if isinstance(product_id, bytes):
+                product_id = product_id.decode()
+            
+            print(f"Sync credits: user={user_id}, product={product_id}")
+            
+            # Look up credits for this product
+            credits = PRODUCT_CREDITS.get(product_id, 0)
+            print(f"Credits for {product_id}: {credits}")
+            
+            if credits == 0:
+                return json({"error": f"Unknown product: {product_id}"}, status=400)
+            
+            # Add credits to Supabase
+            self.supabase_service.add_user_credits(user_id, credits)
+            
+            # Update user's plan to paid
+            self.supabase_service.update_user_plan(user_id, "paid")
+            
+            # Log the transaction
+            self.supabase_service.log_credit_purchase(user_id, credits, product_id)
+            
+            # Get updated balance
+            user_row = self.supabase_service.get_user_row(user_id)
+            new_balance = user_row.data.get("credits", 0) if user_row and user_row.data else 0
+            
+            print(f"Successfully added {credits} credits for user {user_id}. New balance: {new_balance}")
+            
+            return json({
+                "success": True,
+                "credits_added": credits,
+                "new_balance": new_balance
+            }, status=200)
+            
         except Exception as e:
             import traceback
             traceback.print_exc()

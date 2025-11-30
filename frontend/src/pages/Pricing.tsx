@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -23,21 +23,58 @@ export default function Pricing() {
     import.meta.env.VITE_BACKEND_URL;
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [creditsAdded, setCreditsAdded] = useState<number | null>(null);
+  const [syncing, setSyncing] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const hasSyncedRef = useRef(false);
 
   useEffect(() => {
     // Check for success query param after payment redirect
-    if (searchParams.get("success") === "true") {
-      setShowSuccess(true);
-      // Clean up the URL
-      setSearchParams({}, { replace: true });
-      // Auto-hide after 5 seconds
-      const timer = setTimeout(() => setShowSuccess(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [searchParams, setSearchParams]);
+    const syncCredits = async () => {
+      const success = searchParams.get("success");
+      const productId = searchParams.get("product");
+      
+      // Only sync if we have both params and haven't synced yet
+      if (success === "true" && productId && !hasSyncedRef.current) {
+        hasSyncedRef.current = true;
+        setSyncing(true);
+        
+        try {
+          // Call backend to sync credits
+          const response = await apiFetch(
+            `${backendUrl}/api/autumn/sync-credits?product=${encodeURIComponent(productId)}`,
+            { method: "GET" }
+          );
+          
+          const result = await response.json();
+          console.log("Sync result:", result);
+          
+          if (result.credits_added) {
+            setCreditsAdded(result.credits_added);
+          }
+          
+          setShowSuccess(true);
+        } catch (error) {
+          console.error("Failed to sync credits:", error);
+          // Still show success (payment went through even if sync failed)
+          setShowSuccess(true);
+        } finally {
+          setSyncing(false);
+          // Clean up the URL
+          setSearchParams({}, { replace: true });
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            setShowSuccess(false);
+            setCreditsAdded(null);
+          }, 5000);
+        }
+      }
+    };
+    
+    syncCredits();
+  }, [searchParams, setSearchParams, backendUrl]);
 
   const handleBuyCredits = async (productId: string) => {
     if (!user) {
@@ -72,13 +109,24 @@ export default function Pricing() {
         <Navbar />
 
         <Container size="4" className="py-20 px-4">
+          {syncing && (
+            <Callout.Root color="blue" className="mb-8">
+              <Callout.Icon>
+                <Loader2 className="animate-spin" size={16} />
+              </Callout.Icon>
+              <Callout.Text>
+                Processing your purchase...
+              </Callout.Text>
+            </Callout.Root>
+          )}
+
           {showSuccess && (
             <Callout.Root color="green" className="mb-8">
               <Callout.Icon>
                 <CheckCircle size={16} />
               </Callout.Icon>
               <Callout.Text>
-                Payment successful! Your credits have been added to your account.
+                Payment successful! {creditsAdded ? `${creditsAdded} credits have been added to your account.` : "Your credits have been added to your account."}
               </Callout.Text>
             </Callout.Root>
           )}
