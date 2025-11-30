@@ -3,11 +3,13 @@ from blacksheep.server.controllers import APIController, post, get
 from services.supabase_service import SupabaseService
 from models.job import JobStatus, VideoJobRequest, VideoGenerationInput
 from services.job_service import JobService
+from services.video_merge_service import VideoMergeService
 
 class Jobs(APIController):
-    def __init__(self, job_service: JobService, supabase_service: SupabaseService):
+    def __init__(self, job_service: JobService, supabase_service: SupabaseService, video_merge_service: VideoMergeService):
         self.job_service = job_service
         self.supabase_service = supabase_service
+        self.video_merge_service = video_merge_service
 
     @post("/video")
     async def add_video_job(self, request: Request, input: FromForm[VideoGenerationInput]):
@@ -115,4 +117,33 @@ class Jobs(APIController):
             return Response(200)
         else:
             return Response(500)
+    
+    @post("/video/merge")
+    async def merge_videos(self, request: Request):
+        """
+        Merges multiple videos from URLs into a single video.
+        Input: JSON body with "video_urls" array (ordered from root to end frame)
+        Return: merged video URL
+        """
+        user_id = request.scope.get("user_id") or self.supabase_service.get_user_id_from_request(request)
+        if not user_id:
+            return json({"error": "Unauthorized"}, status=401)
+        
+        try:
+            body = await request.json()
+            video_urls = body.get("video_urls", [])
+            
+            if not video_urls or not isinstance(video_urls, list):
+                return json({"error": "video_urls array is required"}, status=400)
+            
+            if len(video_urls) < 2:
+                return json({"error": "At least 2 video URLs are required for merging"}, status=400)
+            
+            merged_video_url = await self.video_merge_service.merge_videos(video_urls, user_id)
+            
+            return json({"video_url": merged_video_url})
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return json({"error": str(e)}, status=500)
         

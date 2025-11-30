@@ -1,9 +1,10 @@
-import React from "react";
-import { Button, Flex, Tooltip } from "@radix-ui/themes";
+import React, { useState } from "react";
+import { Button, Flex, Tooltip, Spinner } from "@radix-ui/themes";
 import { Eraser, Video } from "lucide-react";
 import { Editor } from "tldraw";
 import { toast } from "sonner";
 import { useFrameGraphContext } from "../../contexts/FrameGraphContext";
+import { apiFetch } from "../../utils/api";
 
 interface CanvasToolbarProps {
   onClear: () => void;
@@ -15,8 +16,9 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   editorRef,
 }) => {
   const frameGraph = useFrameGraphContext();
+  const [isMerging, setIsMerging] = useState(false);
 
-  const handleMergeVideos = () => {
+  const handleMergeVideos = async () => {
     if (!editorRef.current) {
       toast.error("Editor not ready. Please wait a moment and try again.");
       return;
@@ -46,6 +48,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
     }
 
     // Collect video URLs from arrows in the path
+    // The path is ordered from root to selected frame, so videoUrls will be in correct order
     const videoUrls: string[] = [];
 
     // Traverse the path (skip the root frame, start from the first child)
@@ -69,9 +72,63 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
       return;
     }
 
-    // Log the array of video URLs
-    console.log("Video URLs for merging:", videoUrls);
-    toast.success(`Found ${videoUrls.length} video${videoUrls.length === 1 ? "" : "s"} to merge.`);
+    if (videoUrls.length < 2) {
+      toast.error("At least 2 videos are required for merging.");
+      return;
+    }
+
+    // Call backend API to merge videos
+    setIsMerging(true);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
+    try {
+      const response = await apiFetch(`${backendUrl}/api/jobs/video/merge`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ video_urls: videoUrls }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const mergedVideoUrl = result.video_url;
+
+      if (!mergedVideoUrl) {
+        throw new Error("No video URL returned from server");
+      }
+
+      toast.success(`Successfully merged ${videoUrls.length} videos!`);
+      console.log("Merged video URL:", mergedVideoUrl);
+      
+      // Download the merged video
+      try {
+        const videoResponse = await fetch(mergedVideoUrl);
+        const videoBlob = await videoResponse.blob();
+        const url = window.URL.createObjectURL(videoBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `merged-video-${Date.now()}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        toast.success("Video downloaded successfully!");
+      } catch (downloadError) {
+        console.error("Error downloading video:", downloadError);
+        toast.error("Video merged but download failed. You can access it at the URL in the console.");
+      }
+      
+    } catch (error) {
+      console.error("Error merging videos:", error);
+      toast.error(`Failed to merge videos: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setIsMerging(false);
+    }
   };
 
   return (
@@ -99,11 +156,16 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             variant="surface"
             color="green"
             onClick={handleMergeVideos}
-            style={{ cursor: "pointer" }}
+            disabled={isMerging}
+            style={{ cursor: isMerging ? "not-allowed" : "pointer" }}
             className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all"
           >
-            <Video size={16} />
-            Merge Videos
+            {isMerging ? (
+              <Spinner size="1" />
+            ) : (
+              <Video size={16} />
+            )}
+            {isMerging ? "Merging..." : "Merge Videos"}
           </Button>
         </Tooltip>
       </Flex>

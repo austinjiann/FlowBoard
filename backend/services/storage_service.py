@@ -22,17 +22,25 @@ class StorageService:
                     )
                 
                 # Initialize client with credentials (or use default)
+                # Always pass project ID explicitly
                 if credentials:
-                    self.client = storage.Client(credentials=credentials)
+                    self.client = storage.Client(
+                        project=settings.GOOGLE_CLOUD_PROJECT,
+                        credentials=credentials
+                    )
                 else:
-                    self.client = storage.Client()
+                    self.client = storage.Client(project=settings.GOOGLE_CLOUD_PROJECT)
                 
                 self.bucket = self.client.bucket(settings.GOOGLE_CLOUD_BUCKET_NAME)
+                print(f"Successfully initialized Google Cloud Storage with bucket: {settings.GOOGLE_CLOUD_BUCKET_NAME}")
             except Exception as e:
+                import traceback
                 print(f"Warning: Could not initialize Google Cloud Storage: {e}")
+                traceback.print_exc()
                 self.client = None
                 self.bucket = None
         else:
+            print("Warning: GOOGLE_CLOUD_BUCKET_NAME not set in environment")
             self.client = None
             self.bucket = None
 

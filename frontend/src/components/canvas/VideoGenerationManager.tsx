@@ -46,13 +46,45 @@ export const VideoGenerationManager = () => {
               `${backend_url}/api/jobs/video/${jobId}`,
             );
 
-            // 404 is expected when job completes and gets cleaned up from Redis
+            // 404 means job not found - could be completed and cleaned up, or expired/failed
             if (response.status === 404) {
               const intervalId = intervalsRef.current.get(jobId);
               if (intervalId) {
                 window.clearInterval(intervalId);
                 intervalsRef.current.delete(jobId);
               }
+
+              // Check if job was already completed successfully
+              if (completedJobsRef.current.has(jobId)) {
+                // Job was completed, just cleanup polling
+                return;
+              }
+
+              // Job not found and never completed - treat as error
+              toast.error("Video generation failed or expired");
+
+              // Find and delete the arrow
+              const currentArrow = editor
+                .getCurrentPageShapes()
+                .find((s) => s.type === "arrow" && s.meta?.jobId === jobId);
+
+              if (currentArrow) {
+                editor.deleteShapes([currentArrow.id]);
+
+                // Find and delete the target frame
+                const bindings = editor.getBindingsInvolvingShape(
+                  currentArrow.id,
+                );
+                const endBinding = bindings.find(
+                  (b: any) =>
+                    b.fromId === currentArrow.id && b.props.terminal === "end",
+                );
+                if (endBinding) {
+                  const targetFrameId = (endBinding as any).toId;
+                  editor.deleteShapes([targetFrameId]);
+                }
+              }
+
               return;
             }
 
