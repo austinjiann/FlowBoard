@@ -204,8 +204,13 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             variant="surface"
             color="red"
             onClick={onClear}
-            style={{ cursor: "pointer" }}
-            className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all"
+            style={{ 
+              cursor: "pointer",
+              background: "rgba(255, 255, 255, 0.4)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255, 255, 255, 0.6)"
+            }}
+            className="hover:bg-white/60 transition-all"
           >
             <Eraser size={16} />
             Clear
@@ -218,8 +223,13 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             color="green"
             onClick={handleMergeVideos}
             disabled={isMerging}
-            style={{ cursor: isMerging ? "not-allowed" : "pointer" }}
-            className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all"
+            style={{ 
+              cursor: isMerging ? "not-allowed" : "pointer",
+              background: "rgba(255, 255, 255, 0.4)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255, 255, 255, 0.6)"
+            }}
+            className="hover:bg-white/60 transition-all"
           >
             {isMerging ? <Spinner size="1" /> : <Video size={16} />}
             {isMerging ? "Merging..." : "Merge Videos"}
@@ -229,7 +239,13 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           <Tooltip content="Credits Remaining">
             <Button
               variant="surface"
-              className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all cursor-default"
+              style={{ 
+                cursor: "pointer",
+                background: "rgba(255, 255, 255, 0.4)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(255, 255, 255, 0.6)"
+              }}
+              className="hover:bg-white/60 transition-all"
               onClick={() => {open("/pricing", "_blank");}}
             >
               <Coins size={16} />

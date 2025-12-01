@@ -52,6 +52,27 @@ body.hide-handles .tl-handle {
   pointer-events: auto !important;
 }
 
+/* Frosted Glass for Style Panel */
+.tlui-style-panel {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 16px !important;
+}
+
+/* Frosted Glass for Toolbar Container */
+.tlui-toolbar__tools {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 16px !important;
+}
+
+
 /* Ensure buttons inside don't block the glass */
 .tlui-menu-zone .tlui-button,
 .tlui-menu-zone .tlui-menu-button {

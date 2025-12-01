@@ -54,7 +54,7 @@ export const CanvasNavigationMenu: React.FC = () => {
       {/* Menu Button */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="fixed bottom-6 left-6 z-50 p-4 bg-white/90 backdrop-blur-md border border-pink-200/50 rounded-2xl shadow-xl shadow-pink-500/10 hover:bg-white hover:border-pink-300/50 transition-all duration-200 cursor-pointer group"
+        className="fixed bottom-6 left-6 z-50 p-4 bg-white/40 backdrop-blur-xl border border-white/60 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] hover:bg-white/50 transition-all duration-200 cursor-pointer group"
         aria-label="Open navigation menu"
       >
         <Menu className="w-6 h-6 text-gray-700 group-hover:text-pink-500 transition-colors" />
