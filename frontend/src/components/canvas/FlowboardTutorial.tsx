@@ -15,50 +15,30 @@ export const TutorialSlideshow: React.FC<TutorialSlideshowProps> = ({
   const slides = [
     {
       title: "Welcome to Flowboard",
-<<<<<<< Updated upstream
-      description: "Create beautiful animations in minutes on our canvas",
-      videoUrl: "/demo/demo-1080p.mp4",
-=======
       description:
         "Create beautiful animations in minutes on our canvas",
       videoUrl: "/demo/demo.mp4",
->>>>>>> Stashed changes
       tip: "Every user starts with a 50 credit free trial!",
     },
     {
       title: "Upload an image and annotate",
-<<<<<<< Updated upstream
-      description: "Select any image—use our canvas to annotate edits",
-      videoUrl: "/demo/demo-1080p.mp4",
-=======
       description:
         "Select any image—use our canvas to annotate edits",
       videoUrl: "/demo/tutorial1.mp4",
->>>>>>> Stashed changes
       tip: "Circle areas of the image and write edits!",
     },
     {
       title: "Or draw from scratch",
-<<<<<<< Updated upstream
-      description: "Create your own world—use our tools to draw sketches",
-      videoUrl: "/demo/demo-1080p.mp4",
-=======
       description:
         "Create your own world—use our tools to draw sketches",
       videoUrl: "/demo/tutorial vid 2.mp4",
->>>>>>> Stashed changes
       tip: "Use the improve frame button to enhance sketches!",
     },
     {
       title: "Prompt and generate",
-<<<<<<< Updated upstream
-      description: "Craft a prompt and then generate the next frame",
-      videoUrl: "/demo/demo-1080p.mp4",
-=======
       description:
         "Craft a prompt and then generate the next frame",
       videoUrl: "/demo/demo3.mp4",
->>>>>>> Stashed changes
       tip: "Make sure the prompt is accurate to what you want to animate!",
     },
     {
@@ -70,14 +50,9 @@ export const TutorialSlideshow: React.FC<TutorialSlideshowProps> = ({
     },
     {
       title: "Merge and export",
-<<<<<<< Updated upstream
-      description: "You're all set! Select a frame and merge",
-      videoUrl: "/demo/demo-1080p.mp4",
-=======
       description:
         "You're all set! Select a frame and merge",
       videoUrl: "/demo/demo5.mp4",
->>>>>>> Stashed changes
       tip: "The algorithm merges the whole story—from beginning to the selected frame!",
     },
   ];
