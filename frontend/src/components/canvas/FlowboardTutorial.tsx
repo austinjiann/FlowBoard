@@ -140,7 +140,6 @@ export const TutorialSlideshow: React.FC<TutorialSlideshowProps> = ({
               </div>
             </div>
 
-            {/* Navigation Buttons */}
             <div className="flex items-center justify-between gap-4 mt-8">
               <button
                 onClick={prevSlide}

@@ -347,9 +347,6 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
           .json()
           .catch(() => ({ error: "Unknown error" }));
         if (response.status === 402) {
-          toast.error(
-            "Not enough credits! Please purchase more credits to polish images.",
-          );
           setIsImproving(false);
           editor.updateShapes([
             {
