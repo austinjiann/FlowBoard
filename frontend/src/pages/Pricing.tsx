@@ -11,7 +11,7 @@ import {
   Separator,
   Callout,
 } from "@radix-ui/themes";
-import { Check, Sparkles, Video, Loader2, CheckCircle } from "lucide-react";
+import { Check, Sparkles, Video, Loader2, CheckCircle, X } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import { apiFetch } from "../utils/api";
@@ -19,8 +19,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Pricing() {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState<string | null>(null);
@@ -36,33 +35,35 @@ export default function Pricing() {
     const syncCredits = async () => {
       const success = searchParams.get("success");
       const productId = searchParams.get("product");
-      
+
       // Only sync if we have both params and haven't synced yet
       if (success === "true" && productId && !hasSyncedRef.current) {
         hasSyncedRef.current = true;
         setSyncing(true);
-        
+
         try {
           // Call backend to sync credits (verifies payment with Autumn)
           const response = await apiFetch(
             `${backendUrl}/api/autumn/sync-credits?product=${encodeURIComponent(productId)}`,
             { method: "GET" }
           );
-          
+
           const result = await response.json();
           console.log("Sync result:", result);
-          
+
           if (response.status === 402 || result.verified === false) {
             // Payment not verified - user didn't complete checkout
-            setShowError("Payment not completed. Please complete the checkout to receive credits.");
+            setShowError(
+              "Payment not completed. Please complete the checkout to receive credits."
+            );
             setTimeout(() => setShowError(null), 8000);
             return;
           }
-          
+
           if (result.credits_added) {
             setCreditsAdded(result.credits_added);
           }
-          
+
           setShowSuccess(true);
         } catch (error) {
           console.error("Failed to sync credits:", error);
@@ -80,7 +81,7 @@ export default function Pricing() {
         }
       }
     };
-    
+
     syncCredits();
   }, [searchParams, setSearchParams, backendUrl]);
 
@@ -122,9 +123,7 @@ export default function Pricing() {
               <Callout.Icon>
                 <Loader2 className="animate-spin" size={16} />
               </Callout.Icon>
-              <Callout.Text>
-                Verifying your purchase...
-              </Callout.Text>
+              <Callout.Text>Verifying your purchase...</Callout.Text>
             </Callout.Root>
           )}
 
@@ -133,9 +132,7 @@ export default function Pricing() {
               <Callout.Icon>
                 <span>⚠️</span>
               </Callout.Icon>
-              <Callout.Text>
-                {showError}
-              </Callout.Text>
+              <Callout.Text>{showError}</Callout.Text>
             </Callout.Root>
           )}
 
@@ -145,7 +142,10 @@ export default function Pricing() {
                 <CheckCircle size={16} />
               </Callout.Icon>
               <Callout.Text>
-                Payment successful! {creditsAdded ? `${creditsAdded} credits have been added to your account.` : "Your credits have been added to your account."}
+                Payment successful!{" "}
+                {creditsAdded
+                  ? `${creditsAdded} credits have been added to your account.`
+                  : "Your credits have been added to your account."}
               </Callout.Text>
             </Callout.Root>
           )}
@@ -160,8 +160,8 @@ export default function Pricing() {
               Pay as you go
             </Heading>
             <Text size="4" color="gray" className="max-w-2xl">
-              Purchase credits for video generation or image
-              enhancement. Credits never expire.
+              Purchase credits for video generation or image enhancement.
+              Credits never expire.
             </Text>
             <Flex
               gap="6"
@@ -208,9 +208,8 @@ export default function Pricing() {
                 <Separator size="4" />
 
                 <Flex direction="column" gap="3" flexGrow="1">
-                  <FeatureItem text="Standard quality (720p)" />
-                  <FeatureItem text="Basic editing tools" />
-                  <FeatureItem text="Public projects" />
+                  <FeatureItem text="Full Access" />
+                  <NonFeatureItem text="Non Commercial Use" />
                 </Flex>
 
                 <div className="w-full py-2 px-4 mt-4 text-center text-sm text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
@@ -244,10 +243,10 @@ export default function Pricing() {
                 <Separator size="4" />
 
                 <Flex direction="column" gap="3" flexGrow="1">
-                  <FeatureItem text="HD quality (1080p)" />
-                  <FeatureItem text="Advanced AI models" />
-                  <FeatureItem text="Private projects" />
-                  <FeatureItem text="No watermarks" />
+                  <FeatureItem text="Full Access" />
+                  <FeatureItem text="Stable Generation" />
+                  <FeatureItem text="Customer Support" />
+                  <FeatureItem text="Commercial Use" />
                 </Flex>
 
                 <Button
@@ -266,7 +265,10 @@ export default function Pricing() {
             </Card>
 
             {/* Pro Pack */}
-            <Card size="3" className="p-6 relative overflow-hidden">
+            <Card size="3" className="p-6 relative overflow-hidden border-brand-pink/75 border-2">
+              <div className="absolute top-0 right-0 bg-brand-pink/75 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                BEST VALUE
+              </div>
               <Flex direction="column" height="100%" gap="5">
                 <Box>
                   <Heading size="4" mb="2">
@@ -284,10 +286,10 @@ export default function Pricing() {
                 <Separator size="4" />
 
                 <Flex direction="column" gap="3" flexGrow="1">
-                  <FeatureItem text="4K Video generation" />
-                  <FeatureItem text="Team collaboration" />
-                  <FeatureItem text="Custom AI fine-tuning" />
-                  <FeatureItem text="Priority support" />
+                  <FeatureItem text="Full Access for Best Value" />
+                  <FeatureItem text="Priority Generation" />
+                  <FeatureItem text="Priority Support" />
+                  <FeatureItem text="Commercial Use" />
                 </Flex>
 
                 <Button
@@ -321,6 +323,17 @@ function FeatureItem({ text }: { text: string }) {
         <Check size={14} className="text-black" />
       </div>
       <Text size="2">{text}</Text>
+    </Flex>
+  );
+}
+
+function NonFeatureItem({ text }: { text: string }) {
+  return (
+    <Flex gap="2" align="center"> {/* SAME STYLE */}
+      <div className="bg-black/5 p-1 rounded-full"> {/* SAME STYLE */}
+        <X size={14} className="text-black" /> {/* ADDED */}
+      </div>
+      <Text size="2">{text}</Text> {/* SAME STYLE */}
     </Flex>
   );
 }

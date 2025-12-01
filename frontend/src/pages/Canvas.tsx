@@ -1,5 +1,4 @@
 import { Tldraw, Editor, DefaultQuickActions, DefaultQuickActionsContent, TldrawUiMenuItem } from "tldraw";
-import "tldraw/tldraw.css";
 import { useState } from "react";
 import { useCanvas } from "../hooks/useCanvas";
 import { CanvasToolbar } from "../components/canvas/CanvasToolbar";
@@ -9,12 +8,14 @@ import { ArrowActionMenu } from "../components/canvas/ArrowActionMenu";
 import { CanvasNavigationMenu } from "../components/canvas/CanvasNavigationMenu";
 import { FrameGraphProvider } from "../contexts/FrameGraphContext";
 import { FrameGraphInitializer } from "../components/canvas/FrameGraphInitializer";
+import "tldraw/tldraw.css";
 
 const customShapeUtils = [FrameShapeUtil];
 
 export default function Canvas() {
   const { handleMount, handleClear, editorRef } = useCanvas();
   const [editor, setEditor] = useState<Editor | null>(null);
+  const [hideUi, setHideUi] = useState(false);
 
   const handleEditorMount = (editorInstance: Editor) => {
     setEditor(editorInstance);
@@ -28,6 +29,7 @@ export default function Canvas() {
           onMount={handleEditorMount}
           shapeUtils={customShapeUtils}
           persistenceKey="hack-western-canvas-v3"
+          hideUi={hideUi}
           components={{
             OnTheCanvas: () => (
               <>
@@ -49,7 +51,7 @@ export default function Canvas() {
           }}
         ></Tldraw>
         <CanvasToolbar onClear={handleClear} editorRef={editorRef} />
-        <CanvasNavigationMenu />
+        <CanvasNavigationMenu setHideUi={setHideUi} /> 
       </div>
     </FrameGraphProvider>
   );

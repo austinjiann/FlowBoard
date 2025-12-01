@@ -1,14 +1,23 @@
 import React, { useState } from "react";
-import { Menu, Home, LayoutDashboard, LogIn, BookOpen, LogOut } from "lucide-react";
+import {
+  Menu,
+  Home,
+  LayoutDashboard,
+  LogIn,
+  BookOpen,
+  LogOut,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { TutorialSlideshow } from "./FlowboardTutorial";
 import { useAuth } from "../../contexts/AuthContext";
 
-export const CanvasNavigationMenu: React.FC = () => {
+export const CanvasNavigationMenu: React.FC<{
+  setHideUi: (v: boolean) => void;
+}> = ({ setHideUi }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const navigate = useNavigate();
-  const {user, signOut} = useAuth();
+  const { user, signOut } = useAuth();
 
   const handleLogout = async () => {
     await signOut();
@@ -36,6 +45,7 @@ export const CanvasNavigationMenu: React.FC = () => {
       label: "Tutorial",
       icon: BookOpen,
       onClick: () => {
+        setHideUi(true);
         setIsMenuOpen(false);
         setTimeout(() => setIsTutorialOpen(true), 200);
       },
@@ -49,9 +59,14 @@ export const CanvasNavigationMenu: React.FC = () => {
 
   return (
     <>
-      <TutorialSlideshow isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
-      
-      {/* Menu Button */}
+      <TutorialSlideshow
+        isOpen={isTutorialOpen}
+        onClose={() => {
+          setIsTutorialOpen(false);
+          setHideUi(false);
+        }}
+      />
+
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         className="fixed bottom-6 left-6 z-50 p-4 bg-white/40 backdrop-blur-xl border border-white/60 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] hover:bg-white/50 transition-all duration-200 cursor-pointer group"
@@ -60,10 +75,9 @@ export const CanvasNavigationMenu: React.FC = () => {
         <Menu className="w-6 h-6 text-gray-700 group-hover:text-pink-500 transition-colors" />
       </button>
 
-      {/* Menu Overlay */}
       {isMenuOpen && (
         <>
-          <div 
+          <div
             className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
             onClick={() => setIsMenuOpen(false)}
           />

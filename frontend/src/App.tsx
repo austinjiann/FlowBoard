@@ -5,6 +5,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import { NavigationEventListener } from "./events/NagivationEventListener";
 import Landing from "./pages/Landing";
 import Canvas from "./pages/Canvas";
 import Dashboard from "./pages/Dashboard";
@@ -19,6 +20,7 @@ export default function App() {
         <AuthProvider>
           <Toaster position="bottom-center" richColors />
           <BrowserRouter>
+            <NavigationEventListener />
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route

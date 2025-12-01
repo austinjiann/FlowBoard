@@ -187,7 +187,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
             pointerEvents: "auto",
           }}
         >
-          <FrameActionMenu shapeId={shape.id} />
+          <FrameActionMenu shapeId={shape.id}/>
         </div>
       </HTMLContainer>
     );
