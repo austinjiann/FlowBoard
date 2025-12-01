@@ -314,7 +314,7 @@ export function seedDefaultCanvas(editor: Editor, frameId?: TLShapeId | null) {
   });
 
   addText(
-    `Made at HackWestern 2025\n❤️ Like our Devpost!\n${DEVPOST_URL}`,
+    `Made at HackWestern 2025\n❤️ Check out our Devpost!\n${DEVPOST_URL}`,
     -1000,
     1300,
     { size: "l", font: "mono" },
