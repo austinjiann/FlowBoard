@@ -249,6 +249,7 @@ export function seedDefaultCanvas(editor: Editor, frameId?: TLShapeId | null) {
     topY + 110,
     { size: "s" },
   );
+    addText(`IF ANYTHING UNEXPECTED HAPPENS, CLEAR COOKIES AND TRY AGAIN! 🍪`, leftColumnX, topY+500, { size: "l", font: "mono" });
 
   const timelineSteps = [
     {
