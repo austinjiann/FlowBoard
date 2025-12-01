@@ -39,10 +39,10 @@ const DEFAULT_IMAGES = [
   // Hack Western logo on left
   {
     url: "https://www.hackwestern.com/horse.svg",
-    x: -1200,
-    y: 0,
-    width: 300,
-    height: 400,
+    x: -900,
+    y: 950,
+    width: 250,
+    height: 350,
     name: "horse.svg",
     mimeType: "image/svg+xml",
     rotation: -0.15,
@@ -50,8 +50,8 @@ const DEFAULT_IMAGES = [
   // MLH logo on left
   {
     url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDzLaKuy0S9E_3yCflx2k5nwtEVh3zsZXkjQ&s",
-    x: -1200,
-    y: 500,
+    x: -500,
+    y: 1100,
     width: 300,
     height: 120,
     name: "mlh-logo.jpg",
@@ -60,8 +60,8 @@ const DEFAULT_IMAGES = [
   },
   {
     url: "./images/canvas.jpeg",
-    x: -1200,
-    y: 1000,
+    x: -900,
+    y: 500,
     width: 800,
     height: 400,
     name: "canvas.jpeg",
@@ -71,8 +71,8 @@ const DEFAULT_IMAGES = [
   // Profile pictures grouped on left with devpost and github
   {
     url: "https://lh3.googleusercontent.com/a/ACg8ocKcV1LTfUxMro7BGePfJdnjhqbi7JxNVDOSUZuTjJgBdQ=s96-c?height=180&width=180",
-    x: -700,
-    y: 0,
+    x: -850,
+    y: -350,
     width: 200,
     height: 200,
     name: "profile-1.jpg",
@@ -81,8 +81,8 @@ const DEFAULT_IMAGES = [
   },
   {
     url: "https://d112y698adiu2z.cloudfront.net/photos/production/user_photos/003/639/856/datas/profile.jpg",
-    x: -700,
-    y: 350,
+    x: -850,
+    y: 0,
     width: 200,
     height: 200,
     name: "profile-2.jpg",
@@ -91,8 +91,8 @@ const DEFAULT_IMAGES = [
   },
   {
     url: "https://d112y698adiu2z.cloudfront.net/photos/production/user_photos/003/751/529/datas/profile.jpg",
-    x: -350,
-    y: 350,
+    x: -500,
+    y: 0,
     width: 200,
     height: 200,
     name: "profile-3.jpg",
@@ -101,8 +101,8 @@ const DEFAULT_IMAGES = [
   },
   {
     url: "./images/ferd.jpg",
-    x: -350,
-    y: 0,
+    x: -500,
+    y: -350,
     width: 200,
     height: 200,
     name: "profile-1.jpg",
@@ -314,9 +314,23 @@ export function seedDefaultCanvas(editor: Editor, frameId?: TLShapeId | null) {
   });
 
   addText(
-    `Resources\nGitHub: ${GITHUB_URL}\nDevpost: ${DEVPOST_URL}`,
-    -1300,
-    750,
+    `Made at HackWestern 2025\n❤️ Like our Devpost!\n${DEVPOST_URL}`,
+    -1000,
+    1300,
+    { size: "l", font: "mono" },
+  );
+
+  addText(
+    `⭐️ Star our GitHub! \n${GITHUB_URL}`,
+    -1000,
+    300,
+    { size: "l", font: "mono" },
+  );
+
+  addText(
+    `The FlowBoard Team 🚀`,
+    -800,
+    -100,
     { size: "l", font: "mono" },
   );
 

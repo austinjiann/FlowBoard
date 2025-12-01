@@ -230,6 +230,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             <Button
               variant="surface"
               className="backdrop-blur-sm bg-white/50 hover:bg-white/80 transition-all cursor-default"
+              onClick={() => {open("/pricing", "_blank");}}
             >
               <Coins size={16} />
               {credits !== null ? credits : "..."} Credit{credits === 1 ? "" : "s"}
