@@ -2,7 +2,7 @@
 
 > **Direct Your Video Frame by Frame**
 
-https://github.com/user-attachments/assets/bd51f5c9-d22b-4207-812f-29e0d95ed803
+Uploading FlowBoard Demo.mp4…
 
 AI-powered video storyboarding that transforms sketches into context-aware video clips. Draw, prompt, generate—infinitely.
 
