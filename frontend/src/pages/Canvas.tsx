@@ -4,7 +4,8 @@ import {
   DefaultQuickActions,
   DefaultQuickActionsContent,
 } from "tldraw";
-import { useState } from "react";
+import "tldraw/tldraw.css";
+import { useState, useEffect } from "react";
 import { useCanvas } from "../hooks/useCanvas";
 import { CanvasToolbar } from "../components/canvas/CanvasToolbar";
 import { FrameShapeUtil } from "../components/canvas/VideoCanvasComponent";
@@ -14,7 +15,7 @@ import { CanvasNavigationMenu } from "../components/canvas/CanvasNavigationMenu"
 import { FrameGraphProvider } from "../contexts/FrameGraphContext";
 import { FrameGraphInitializer } from "../components/canvas/FrameGraphInitializer";
 //import { GitHubStars } from "../components/GitHubStars";
-import "tldraw/tldraw.css";
+import { MonitorX } from "lucide-react";
 
 const GitHubButton = () => {
   return (
@@ -41,11 +42,42 @@ export default function Canvas() {
   const { handleMount, handleClear, editorRef } = useCanvas();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [hideUi, setHideUi] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const isSmallScreen = window.innerWidth < 768;
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      setIsMobile(isSmallScreen && isTouchDevice);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleEditorMount = (editorInstance: Editor) => {
     setEditor(editorInstance);
     handleMount(editorInstance);
   };
+
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 bg-white/80 backdrop-blur-md flex items-center justify-center p-6 z-50">
+        <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border border-gray-200">
+          <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <MonitorX className="w-10 h-10 text-pink-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 font-ananda">
+            Desktop Experience Required
+          </h2>
+          <p className="text-gray-600 leading-relaxed">
+            FlowBoard is designed for larger screens to give you the best creative experience. Please switch to a tablet, laptop, or desktop computer to continue.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <FrameGraphProvider editor={editor}>

@@ -1,6 +1,7 @@
 import { Theme } from "@radix-ui/themes";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
+import TutorialSection from "../components/landing/TutorialSection";
 import DemoSection from "../components/landing/DemoSection";
 import Footer from "../components/landing/Footer";
 
@@ -14,6 +15,7 @@ function Landing() {
         <div className="relative z-10">
           <Navbar />
           <Hero />
+          <TutorialSection />
           <DemoSection />
           <Footer />
         </div>

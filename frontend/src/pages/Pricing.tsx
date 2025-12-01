@@ -113,11 +113,11 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="relative z-10">
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="relative z-10 flex-1 flex flex-col">
         <Navbar />
 
-        <Container size="4" className="py-20 px-4">
+        <Container size="4" className="py-20 px-4 flex-1">
           {syncing && (
             <Callout.Root color="blue" className="mb-8">
               <Callout.Icon>
