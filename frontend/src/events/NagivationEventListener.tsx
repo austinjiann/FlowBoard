@@ -9,11 +9,11 @@ export function NavigationEventListener() {
     const handler = (e) => {
       const { to, toast: toastObj } = e.detail || {};
 
-      if (toastObj?.message) {           
+      if (toastObj?.message) {
         toast.error(toastObj.message);
       }
 
-      if (to) navigate(to);              
+      if (to) navigate(to);
     };
 
     window.addEventListener("app:navigate", handler);

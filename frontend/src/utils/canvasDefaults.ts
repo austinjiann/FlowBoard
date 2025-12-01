@@ -320,19 +320,12 @@ export function seedDefaultCanvas(editor: Editor, frameId?: TLShapeId | null) {
     { size: "l", font: "mono" },
   );
 
-  addText(
-    `⭐️ Star our GitHub! \n${GITHUB_URL}`,
-    -1000,
-    300,
-    { size: "l", font: "mono" },
-  );
+  addText(`⭐️ Star our GitHub! \n${GITHUB_URL}`, -1000, 300, {
+    size: "l",
+    font: "mono",
+  });
 
-  addText(
-    `The FlowBoard Team 🚀`,
-    -800,
-    -100,
-    { size: "l", font: "mono" },
-  );
+  addText(`The FlowBoard Team 🚀`, -800, -100, { size: "l", font: "mono" });
 
   // Insert default images from array
   const assets: TLImageAsset[] = [];

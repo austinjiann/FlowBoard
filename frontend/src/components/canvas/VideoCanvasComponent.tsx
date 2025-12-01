@@ -38,7 +38,7 @@ const FrameOverlay = ({ shapeId }: { shapeId: string }) => {
 
   // Find the tldraw container to portal into instead of document.body
   // This keeps the overlay within tldraw's stacking context
-  const tldrawContainer = document.querySelector('.tl-container');
+  const tldrawContainer = document.querySelector(".tl-container");
 
   return createPortal(
     <div
@@ -187,7 +187,7 @@ export class FrameShapeUtil extends BaseBoxShapeUtil<IFrameShape> {
             pointerEvents: "auto",
           }}
         >
-          <FrameActionMenu shapeId={shape.id}/>
+          <FrameActionMenu shapeId={shape.id} />
         </div>
       </HTMLContainer>
     );

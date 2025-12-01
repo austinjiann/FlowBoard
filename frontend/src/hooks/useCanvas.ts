@@ -235,7 +235,7 @@ export const useCanvas = () => {
             }
           }
         },
-        { source: "user", scope: "document" }
+        { source: "user", scope: "document" },
       );
 
       // Check if any frames already exist in the editor to prevent duplicates in Strict Mode
@@ -298,9 +298,11 @@ export const useCanvas = () => {
       editor.sideEffects.registerBeforeChangeHandler("shape", (prev, next) => {
         // Prevent generating frames from moving
         if (next.type === "aspect-frame") {
-          const nextName = "name" in next.props ? (next.props.name as string) : "";
-          const prevName = "name" in prev.props ? (prev.props.name as string) : "";
-          
+          const nextName =
+            "name" in next.props ? (next.props.name as string) : "";
+          const prevName =
+            "name" in prev.props ? (prev.props.name as string) : "";
+
           // If frame is being generated, prevent position changes
           if (nextName === "Generating..." || prevName === "Generating...") {
             // Only block if position is changing
@@ -419,18 +421,22 @@ export const useCanvas = () => {
           if (prev.pageId !== next.pageId) {
             ensureTutorialLayout(editor, { immediate: true });
           }
-          
+
           // Filter out placeholder images from selection
           const selectedIds = editor.getSelectedShapeIds();
           const placeholderIds = selectedIds.filter((id) => {
             const shape = editor.getShape(id);
-            return shape?.type === "image" && shape?.meta?.isPlaceholder === true;
+            return (
+              shape?.type === "image" && shape?.meta?.isPlaceholder === true
+            );
           });
-          
+
           if (placeholderIds.length > 0) {
-            editor.setSelectedShapes(selectedIds.filter((id) => !placeholderIds.includes(id)));
+            editor.setSelectedShapes(
+              selectedIds.filter((id) => !placeholderIds.includes(id)),
+            );
           }
-          
+
           return next;
         },
       );

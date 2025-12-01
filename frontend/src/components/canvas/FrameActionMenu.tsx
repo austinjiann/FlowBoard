@@ -37,7 +37,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
   const isSelected = useValue(
     "is selected",
     () => editor.getSelectedShapeIds().includes(shapeId),
-    [editor, shapeId]
+    [editor, shapeId],
   );
 
   const frame = useValue("frame", () => editor.getShape(shapeId), [
@@ -87,7 +87,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
   const showTextBox = isSelected || promptText.trim() !== "";
 
   const handleBackgroundColorChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     e.stopPropagation();
     editor.updateShapes([
@@ -185,7 +185,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       // Convert byte array to base64
       const bytes = new Uint8Array(imageBytes);
       const binaryString = Array.from(bytes, (byte) =>
-        String.fromCharCode(byte)
+        String.fromCharCode(byte),
       ).join("");
       base64String = btoa(binaryString);
     } else if (typeof imageBytes === "string") {
@@ -250,7 +250,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       }
     } else {
       throw new Error(
-        `Invalid image data format: ${typeof imageBytes}. Expected array or string.`
+        `Invalid image data format: ${typeof imageBytes}. Expected array or string.`,
       );
     }
 
@@ -268,7 +268,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
   };
 
   const validateImageLoad = async (
-    dataUrl: string
+    dataUrl: string,
   ): Promise<HTMLImageElement> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -348,7 +348,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
           .catch(() => ({ error: "Unknown error" }));
         if (response.status === 402) {
           toast.error(
-            "Not enough credits! Please purchase more credits to polish images."
+            "Not enough credits! Please purchase more credits to polish images.",
           );
           setIsImproving(false);
           editor.updateShapes([
@@ -370,7 +370,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                     "Not enough credits! Purchase more credits to continue.",
                 },
               },
-            })
+            }),
           );
 
           return;
@@ -446,7 +446,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
       editor.updateInstanceState({ isReadonly: false });
     } catch (error) {
       toast.error(
-        `Failed to improve frame: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to improve frame: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
       setIsImproving(false);
 
@@ -530,7 +530,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     formData.append("custom_prompt", promptText);
     formData.append(
       "global_context",
-      JSON.stringify(context?.sceneState ?? {})
+      JSON.stringify(context?.sceneState ?? {}),
     );
     formData.append("files", blob);
 
@@ -555,7 +555,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
                     "Not enough credits! Purchase more credits to continue.",
                 },
               },
-            })
+            }),
           );
 
           return;
@@ -685,7 +685,7 @@ export const FrameActionMenu = ({ shapeId }: { shapeId: TLShapeId }) => {
     } catch (error) {
       console.error("Failed to generate video:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to generate video"
+        error instanceof Error ? error.message : "Failed to generate video",
       );
     }
   };

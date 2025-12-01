@@ -22,7 +22,6 @@ export const FrameGraphInitializer = () => {
       (shape) => {
         if (shape.type === "aspect-frame") {
           frameGraph.removeFrameNode(shape.id);
-
         }
       },
     );

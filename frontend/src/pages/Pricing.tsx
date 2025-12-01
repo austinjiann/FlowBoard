@@ -45,7 +45,7 @@ export default function Pricing() {
           // Call backend to sync credits (verifies payment with Autumn)
           const response = await apiFetch(
             `${backendUrl}/api/autumn/sync-credits?product=${encodeURIComponent(productId)}`,
-            { method: "GET" }
+            { method: "GET" },
           );
 
           const result = await response.json();
@@ -54,7 +54,7 @@ export default function Pricing() {
           if (response.status === 402 || result.verified === false) {
             // Payment not verified - user didn't complete checkout
             setShowError(
-              "Payment not completed. Please complete the checkout to receive credits."
+              "Payment not completed. Please complete the checkout to receive credits.",
             );
             setTimeout(() => setShowError(null), 8000);
             return;
@@ -265,7 +265,10 @@ export default function Pricing() {
             </Card>
 
             {/* Pro Pack */}
-            <Card size="3" className="p-6 relative overflow-hidden border-brand-pink/75 border-2">
+            <Card
+              size="3"
+              className="p-6 relative overflow-hidden border-brand-pink/75 border-2"
+            >
               <div className="absolute top-0 right-0 bg-brand-pink/75 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
                 BEST VALUE
               </div>
@@ -329,8 +332,12 @@ function FeatureItem({ text }: { text: string }) {
 
 function NonFeatureItem({ text }: { text: string }) {
   return (
-    <Flex gap="2" align="center"> {/* SAME STYLE */}
-      <div className="bg-black/5 p-1 rounded-full"> {/* SAME STYLE */}
+    <Flex gap="2" align="center">
+      {" "}
+      {/* SAME STYLE */}
+      <div className="bg-black/5 p-1 rounded-full">
+        {" "}
+        {/* SAME STYLE */}
         <X size={14} className="text-black" /> {/* ADDED */}
       </div>
       <Text size="2">{text}</Text> {/* SAME STYLE */}

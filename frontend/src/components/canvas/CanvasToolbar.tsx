@@ -132,8 +132,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
 
     // Call backend API to merge videos
     setIsMerging(true);
-    const backendUrl =
-      import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     try {
       const response = await apiFetch(`${backendUrl}/api/jobs/video/merge`, {
@@ -198,17 +197,16 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
         p="2"
         className="rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-xl bg-white/40"
       >
-
         <Tooltip content="Clear Canvas">
           <Button
             variant="surface"
             color="red"
             onClick={onClear}
-            style={{ 
+            style={{
               cursor: "pointer",
               background: "rgba(255, 255, 255, 0.4)",
               backdropFilter: "blur(12px)",
-              border: "1px solid rgba(255, 255, 255, 0.6)"
+              border: "1px solid rgba(255, 255, 255, 0.6)",
             }}
             className="hover:bg-white/60 transition-all"
           >
@@ -223,11 +221,11 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             color="green"
             onClick={handleMergeVideos}
             disabled={isMerging}
-            style={{ 
+            style={{
               cursor: isMerging ? "not-allowed" : "pointer",
               background: "rgba(255, 255, 255, 0.4)",
               backdropFilter: "blur(12px)",
-              border: "1px solid rgba(255, 255, 255, 0.6)"
+              border: "1px solid rgba(255, 255, 255, 0.6)",
             }}
             className="hover:bg-white/60 transition-all"
           >
@@ -239,17 +237,20 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           <Tooltip content="Credits Remaining">
             <Button
               variant="surface"
-              style={{ 
+              style={{
                 cursor: "pointer",
                 background: "rgba(255, 255, 255, 0.4)",
                 backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255, 255, 255, 0.6)"
+                border: "1px solid rgba(255, 255, 255, 0.6)",
               }}
               className="hover:bg-white/60 transition-all"
-              onClick={() => {open("/pricing", "_blank");}}
+              onClick={() => {
+                open("/pricing", "_blank");
+              }}
             >
               <Coins size={16} />
-              {credits !== null ? credits : "..."} Credit{credits === 1 ? "" : "s"}
+              {credits !== null ? credits : "..."} Credit
+              {credits === 1 ? "" : "s"}
             </Button>
           </Tooltip>
         )}

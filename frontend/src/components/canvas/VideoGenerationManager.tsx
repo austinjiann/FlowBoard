@@ -298,9 +298,8 @@ export const VideoGenerationManager = () => {
                             editor.createAssets([asset]);
 
                             // Delete placeholder image if it exists
-                            const targetFrameChildren = editor.getSortedChildIdsForParent(
-                              targetFrameId,
-                            );
+                            const targetFrameChildren =
+                              editor.getSortedChildIdsForParent(targetFrameId);
                             const placeholderImage = targetFrameChildren
                               .map((id) => editor.getShape(id))
                               .find(

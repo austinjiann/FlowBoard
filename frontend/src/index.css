@@ -72,7 +72,6 @@ body.hide-handles .tl-handle {
   border-radius: 16px !important;
 }
 
-
 /* Ensure buttons inside don't block the glass */
 .tlui-menu-zone .tlui-button,
 .tlui-menu-zone .tlui-menu-button {

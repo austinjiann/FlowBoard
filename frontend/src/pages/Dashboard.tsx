@@ -139,8 +139,14 @@ function Dashboard() {
                     <span className="text-sm text-gray-500">Show:</span>
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger>
-                        <Button variant="soft" color="gray" className="cursor-pointer">
-                          {displayLimit === "all" ? "All" : `Last ${displayLimit}`}
+                        <Button
+                          variant="soft"
+                          color="gray"
+                          className="cursor-pointer"
+                        >
+                          {displayLimit === "all"
+                            ? "All"
+                            : `Last ${displayLimit}`}
                           <ChevronDown className="w-4 h-4 ml-1" />
                         </Button>
                       </DropdownMenu.Trigger>
@@ -155,7 +161,9 @@ function Dashboard() {
                           Last 50
                         </DropdownMenu.Item>
                         <DropdownMenu.Separator />
-                        <DropdownMenu.Item onSelect={() => setDisplayLimit("all")}>
+                        <DropdownMenu.Item
+                          onSelect={() => setDisplayLimit("all")}
+                        >
                           All
                         </DropdownMenu.Item>
                       </DropdownMenu.Content>
@@ -191,13 +199,18 @@ function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {(displayLimit === "all" ? transactions : transactions.slice(0, displayLimit)).map((transaction, index) => (
+                        {(displayLimit === "all"
+                          ? transactions
+                          : transactions.slice(0, displayLimit)
+                        ).map((transaction, index) => (
                           <tr
                             key={index}
                             className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors"
                           >
                             <td className="py-3 px-4 text-gray-600">
-                              {new Date(transaction.created_at).toLocaleString()}
+                              {new Date(
+                                transaction.created_at,
+                              ).toLocaleString()}
                             </td>
                             <td className="py-3 px-4 text-gray-900">
                               {transaction.transaction_type}
@@ -233,7 +246,11 @@ function Dashboard() {
                 )}
                 {transactions.length > 0 && (
                   <div className="mt-4 text-sm text-gray-500 text-center">
-                    Showing {displayLimit === "all" ? transactions.length : Math.min(displayLimit, transactions.length)} of {transactions.length} transactions
+                    Showing{" "}
+                    {displayLimit === "all"
+                      ? transactions.length
+                      : Math.min(displayLimit, transactions.length)}{" "}
+                    of {transactions.length} transactions
                   </div>
                 )}
               </div>
