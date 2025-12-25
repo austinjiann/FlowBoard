@@ -18,7 +18,7 @@ export const TutorialContent: React.FC<TutorialContentProps> = ({
       title: "Welcome to Flowboard",
       description: "Create beautiful animations in minutes on our canvas",
       videoUrl: "/demo/tutorial0.mp4",
-      tip: "Every user starts with a 50 credit free trial!",
+      tip: "Get started by exploring the canvas!",
     },
     {
       title: "Upload an image and annotate",

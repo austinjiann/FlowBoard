@@ -18,7 +18,7 @@ export const TutorialSlideshow: React.FC<TutorialSlideshowProps> = ({
       description:
         "Create beautiful animations in minutes on our canvas",
       videoUrl: "/demo/tutorial0.mp4",
-      tip: "Every user starts with a 50 credit free trial!",
+      tip: "Get started by exploring the canvas!",
     },
     {
       title: "Upload an image and annotate",

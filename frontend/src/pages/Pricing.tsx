@@ -11,7 +11,7 @@ import {
   Separator,
   Callout,
 } from "@radix-ui/themes";
-import { Check, Sparkles, Video, Loader2, CheckCircle, X } from "lucide-react";
+import { Check, Sparkles, Video, Loader2, CheckCircle } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import { apiFetch } from "../utils/api";
@@ -185,39 +185,10 @@ export default function Pricing() {
           </Flex>
 
           <Grid
-            columns={{ initial: "1", sm: "1", md: "3" }}
+            columns={{ initial: "1", sm: "1", md: "2" }}
             gap="6"
             width="auto"
           >
-            {/* Free Trial */}
-            <Card size="3" className="p-6 relative overflow-hidden">
-              <Flex direction="column" height="100%" gap="5">
-                <Box>
-                  <Heading size="4" mb="2">
-                    Free Trial
-                  </Heading>
-                  <Flex align="baseline" gap="1">
-                    <Heading size="8">50</Heading>
-                    <Text color="gray">Credits</Text>
-                  </Flex>
-                  <Text size="2" color="gray" mt="2">
-                    Enough for 5 videos or 50 image enhancements
-                  </Text>
-                </Box>
-
-                <Separator size="4" />
-
-                <Flex direction="column" gap="3" flexGrow="1">
-                  <FeatureItem text="Full Access" />
-                  <NonFeatureItem text="Non Commercial Use" />
-                </Flex>
-
-                <div className="w-full py-2 px-4 mt-4 text-center text-sm text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
-                  Included by default
-                </div>
-              </Flex>
-            </Card>
-
             {/* Starter Pack */}
             <Card
               size="3"
@@ -330,17 +301,3 @@ function FeatureItem({ text }: { text: string }) {
   );
 }
 
-function NonFeatureItem({ text }: { text: string }) {
-  return (
-    <Flex gap="2" align="center">
-      {" "}
-      {/* SAME STYLE */}
-      <div className="bg-black/5 p-1 rounded-full">
-        {" "}
-        {/* SAME STYLE */}
-        <X size={14} className="text-black" /> {/* ADDED */}
-      </div>
-      <Text size="2">{text}</Text> {/* SAME STYLE */}
-    </Flex>
-  );
-}
