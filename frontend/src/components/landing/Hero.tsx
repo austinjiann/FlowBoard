@@ -1,9 +1,9 @@
 import React from "react";
 import { MousePointer2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useDeploymentNotice } from "../../contexts/DeploymentNoticeContext";
 
 const Hero: React.FC = () => {
-  const navigate = useNavigate();
+  const { openModal } = useDeploymentNotice();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center py-32 overflow-hidden">
@@ -25,7 +25,7 @@ const Hero: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
-            onClick={() => navigate("/app")}
+            onClick={openModal}
             className="w-full sm:w-auto px-8 py-4 bg-black/80 backdrop-blur-md text-white font-bold rounded-xl hover:bg-black transition-all duration-200 flex items-center justify-center gap-2 shadow-xl shadow-black/10 group border border-white/10 cursor-pointer"
           >
             Start Creating

@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 import { NavItem } from "../../types/types";
 import { useAuth } from "../../contexts/AuthContext";
+import { useDeploymentNotice } from "../../contexts/DeploymentNoticeContext";
 import logoImage from "../../assets/logo.png";
 
 const navItems: NavItem[] = [];
@@ -19,6 +20,7 @@ const Navbar: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { openModal } = useDeploymentNotice();
 
   // Get user's display name
   const getUserName = () => {
@@ -137,7 +139,7 @@ const Navbar: React.FC = () => {
           {/* Desktop Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={openModal}
               className="flex items-center gap-2 relative overflow-hidden group bg-white/60 backdrop-blur-md text-gray-700 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-black/5 hover:shadow-black/10 border border-gray-200/50 cursor-pointer hover:bg-white/80"
               style={{
                 paddingLeft: `${interpolate(16, 12, scrollProgress)}px`,
@@ -209,7 +211,7 @@ const Navbar: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={() => navigate("/login")}
+                  onClick={openModal}
                   className="flex items-center gap-2 relative overflow-hidden group bg-white/60 backdrop-blur-md text-gray-700 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-black/5 hover:shadow-black/10 border border-gray-200/50 cursor-pointer hover:bg-white/80"
                   style={{
                     paddingLeft: `${interpolate(16, 12, scrollProgress)}px`,
@@ -229,7 +231,7 @@ const Navbar: React.FC = () => {
                   <span className="relative z-10">Login</span>
                 </button>
                 <button
-                  onClick={() => navigate("/app")}
+                  onClick={openModal}
                   className="relative overflow-hidden group bg-black/80 backdrop-blur-md text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-black/10 hover:shadow-black/20 border border-white/10 cursor-pointer"
                   style={{
                     paddingLeft: `${interpolate(24, 16, scrollProgress)}px`,
@@ -280,9 +282,7 @@ const Navbar: React.FC = () => {
                     ))}
                     <Dialog.Close asChild>
                       <button
-                        onClick={() => {
-                          navigate("/dashboard");
-                        }}
+                        onClick={openModal}
                         className="w-full py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-lg hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
                       >
                         <LayoutDashboard className="w-5 h-5" />
@@ -309,9 +309,7 @@ const Navbar: React.FC = () => {
                       <>
                         <Dialog.Close asChild>
                           <button
-                            onClick={() => {
-                              navigate("/login");
-                            }}
+                            onClick={openModal}
                             className="w-full py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-lg hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
                           >
                             <LogIn className="w-5 h-5" />
@@ -319,9 +317,7 @@ const Navbar: React.FC = () => {
                           </button>
                         </Dialog.Close>
                         <button
-                          onClick={() => {
-                            navigate("/app");
-                          }}
+                          onClick={openModal}
                           className="w-full py-3 bg-black text-white font-bold rounded-xl mt-4 shadow-lg hover:bg-gray-900 transition-colors cursor-pointer"
                         >
                           Get Started
