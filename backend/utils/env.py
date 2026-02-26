@@ -8,8 +8,7 @@ class Settings(BaseSettings):
     GOOGLE_CLOUD_BUCKET_NAME: str
     REDIS_URL: str = ""  # Optional: leave empty for in-memory job store (local dev)
     SUPABASE_URL: str
-    # Accept SUPABASE_KEY from .env (service role / secret key)
-    SUPABASE_SECRET_KEY: str = Field(alias="SUPABASE_KEY")
+    SUPABASE_SECRET_KEY: str
     AUTUMN_SECRET_KEY: str
     FRONTEND_URL: str = "http://localhost:5173"  # Default for local dev
     model_config = SettingsConfigDict(
