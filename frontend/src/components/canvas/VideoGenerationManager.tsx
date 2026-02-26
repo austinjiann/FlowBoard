@@ -393,12 +393,12 @@ export const VideoGenerationManager = () => {
           } catch (e) {
             console.error("Error polling job", jobId, e);
           }
-        }, 2000); // Poll this specific job every 2s
+        }, 5000); // Poll every 5s — video generation (Veo) often takes 3–8+ minutes
 
         // Store this interval
         intervalsRef.current.set(jobId, pollInterval);
       }
-    }, 2000); // Check for new arrows every 2s
+    }, 3000); // Check for new arrows every 3s
 
     return () => {
       // Clear the check interval

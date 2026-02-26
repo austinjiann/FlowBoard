@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 from models.job import JobStatus, VideoJobRequest, VideoJob
 from services.vertex_service import VertexService
 from utils.prompt_builder import create_video_prompt
@@ -10,11 +10,49 @@ import pickle
 import lzma
 import asyncio
 import traceback
+import time
+
+
+class _MemoryStore:
+    """In-memory store with TTL for local dev when Redis is unavailable."""
+
+    def __init__(self):
+        self._data: dict[str, tuple[float, bytes]] = {}
+
+    def setex(self, name: str, time_sec: int, value: bytes) -> None:
+        self._data[name] = (time.time() + time_sec, value)
+
+    def get(self, name: str) -> Optional[bytes]:
+        if name not in self._data:
+            return None
+        expiry, val = self._data[name]
+        if time.time() > expiry:
+            del self._data[name]
+            return None
+        return val
+
+    def delete(self, *names: str) -> None:
+        for name in names:
+            self._data.pop(name, None)
+
+    def ping(self) -> bool:
+        return True
+
 
 class JobService:
     def __init__(self, vertex_service: VertexService):
         self.vertex_service = vertex_service
-        self.redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=False)
+        self.redis_client = self._make_store()
+
+    def _make_store(self) -> Any:
+        if not settings.REDIS_URL:
+            return _MemoryStore()
+        try:
+            client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=False, socket_connect_timeout=3)
+            client.ping()
+            return client
+        except (redis.RedisError, OSError):
+            return _MemoryStore()
 
     def _serialize(self, data: dict) -> bytes:
         """Serialize + compress any data to bytes for Redis storage"""
