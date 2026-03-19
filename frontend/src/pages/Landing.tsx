@@ -8,7 +8,7 @@ import Footer from "../components/landing/Footer";
 function Landing() {
   return (
     <Theme>
-      <div className="min-h-screen relative bg-white">
+      <div className="min-h-screen relative bg-blue-500">
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
 
